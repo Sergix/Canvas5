@@ -1,0 +1,177 @@
+Developer notes on build release1.0 of Canvas5, the JavaScript HTML5 Canvas 2-D Game Engine
+
+Contents
+1. About
+2. Creating a Scene
+   a. Scene properties
+3. Creating a sprite
+   a. GameImage object
+   b. MessageBox object
+   c. Sprite properties
+4. Drawing the scene
+5. Credits
+
+Section 1. About
+
+    Canvas5 is an easy-to-use API for the HTML5 Canvas using JavaScript. It can be used to minimize literally hundreds of lines of
+code into just a few lines. It was completely written by me, Sergix. It was originally intended for my own use as an HTML5 Canvas
+game developer but it is available now as open-source code. A minimized version is coming soon (dev1.0-min). The current build
+of Canvas5 includes the basic functions to create and set up a game. It can be used as either an interface in its entirety or
+simply as a tool to create and store sprites or other objects. Feel free to create code that is compatible with Canvas5 such as
+"plugins" or other add-ons, or for incorporating Canvas5's objects into your own scripts.
+
+
+Section 2. Creating a Scene
+
+    Creating a Scene in Canvas5 only takes one line of code, but this Scene object is very powerful and has an extensive list of
+modifiable properties. To create a Scene object, do the following:
+
+        var sceneName = new Scene(domElement);
+
+while replacing "sceneName" with the variable name of your choice, and "domElement" with the DOM object that the canvas is located
+in. If you don't know what to put or don't want to specify, just put "document".
+
+        var sceneName = new Scene(document);
+
+In your HTML, the "id" of the canvas that is going to be used MUST be "CanvasGame" or it will be unrecognized by the script.
+
+        <canvas id="CanvasGame"></canvas>
+
+The size and other CSS properties of the canvas tag do not matter. You can apply whatever you want to it.
+
+
+Section 2a. Scene properties
+
+    The Scene object contains an extensive list of properties that can be used for different purposes. Here is a complete list:
+
+    domElement  : DOM object that the canvas tag is contained in. Used on creation of the object.
+    canvas      : DOM object of the canvas.
+    context     : context variable of the canvas that is used to draw the scene on the canvas.
+    width       : width of the canvas.
+    height      : height of the canvas.
+    sprites     : array of sprites to be updated and drawn on the canvas.
+  playerSprite  : Sprite object of the player.
+    background  : image used as the background drawn on the canvas.
+backgroundColor : fallback if background variable is unspecified, or if user simply wants color background instead of image.
+    add()       : adds a sprite to the sprites array
+    remove(obj) : removes the "obj" sprite from the sprite array.
+    update()    : updates the sprites' collision detection.
+    render(fps) : draws the scene and all its objects at "fps" frames per second.
+
+
+Section 3. Creating a sprite
+
+    The Sprite object is an object that defines a entity that can be moved on the screen. To create a Sprite object, type the
+following code:
+
+    var spriteName = new Sprite(image);
+
+where "spriteName" is the variable name of your choice and "image" is the image used to draw the sprite. The image must be a
+GameImage object, which is described below. Once a sprite is created, you must add it to the scene for it to be visible. The
+sprite is drawn based on its x and y values, which you can change either by changing the property directly:
+
+    spriteName.x = 0;
+    spriteName.y = 0;
+
+replacing spriteName with the name of the variable, and 0 with the values of your choice. You can also change the position using
+the built-in function:
+    
+    spriteName.setPosition(0, 0);
+
+with the same rules applying as above. The first argument is the x-position and the second argument is the y-position.
+
+
+Section 3a. GameImage object
+
+    The GameImage object is the object used by all of the image-related functions in the engine, which consist of most of the
+drawing and rendering-related functions. To create a GameImage object, type the following:
+
+    var imageName = new GameImage(imageFile);
+
+where "imageName" is the variable name of your choice and "imageFile" is the filepath of the image. For example, let us say I
+want to use an image named "image" located in the same folder as your script. You would use "image.png" as the filepath, also
+replacing "png" with the image format extension. GameImage only has two properties, image and src, where image is the image
+object itself and src is the filepath of the image.
+
+
+Section 3b. MessageBox object
+
+    An interesting thing about the Sprite object is that you can give it a visible name to be displayed in the game. To do this,
+you must use the setName function of your variable, and let the argument be a MessageBox:
+
+    var msgName = new MessageBox("Player", 0, 0);
+    spriteName.setName(msgName);
+
+where msgName are the variable names of your choice, "Player" as the text of your choice, and 0 being the x and y positions of
+your choice. If you are using the variable as a name for a sprite, you can leave out the last two arguments to MessageBox:
+
+    var msgName = new MessageBox("Player");
+
+where the same rules apply as above. MessageBox can also act as a sprite, and if you are not using it as a sprite name you
+must add it to your scene using the Scene object's add() function, just as if adding a sprite. The MessageBox object has an x
+and y property (although you must directly set them). It also has the text property which contains the text. You can set the
+font and size of the text using the font property in the following format: "12pt Arial", with 12 being the number of your choice
+(although 12 is default), and with Arial being the font name of your choice. You can also change the color of the text with the 
+color property. The text also has an alwaysActive property that can be set (default is false), and it tells the engine whether
+to draw it automatically or not. MessageBox also has three functions: update, active, and draw. update(context, fps) updates the text
+using the context provided and at fps frames per second. active(context) tells the object to draw itself now, and draw(context)
+draws the text using the context provided.
+
+Section 3c. Sprite properties
+
+    The Sprite object contains an extensive list of properties that can be used for different purposes. Here is a complete list:
+
+    x                    : x-position of the sprite.
+    y                    : y-position of the sprite.
+    speed                : how fast to set the velocity when moving.
+    vx                   : velocity of the object along the x-axis.
+    vy                   : velocity of the object along the y-axis.
+    ax                   : acceleration of the object along the x-axis.
+    ay                   : acceleration of the object along the y-axis.
+    canMove              : used in collision detection.
+    oldX                 : used in collision detection.
+    oldY                 : used in collision detection.
+    image                : GameImage used to draw the sprite.
+    width                : width of the image property.
+    height               : height of the image property.
+    boundaries           : sets the boundaries of the object as to how far on/off-screen it can go in pixels.
+    collide              : run collision detection on the sprite.
+    name                 : MessageBox used to draw a gamertag-like text block above the sprite.
+    setName(text)        : sets the name property using the text argument.
+    setPosition(x, y)    : sets the position of the sprite.
+    setVelocity(vx, vy)  : sets the velocity of the sprite.
+    setAccel(ax, ay)     : sets the acceleration of the sprite.
+    addBasicControls()   : adds basic keyboard controls to the sprite.
+    onKeyDown(evt)       : responds to keyboard events if controls are set.
+    onKeyUp(evt)         : responds to keyboard events if controls are set.
+    update(context, fps) : updates the sprite.
+    draw(context)        : draws the sprite.
+
+
+Section 4. Drawing the scene
+
+    To draw the scene, you must call the render function of your scene, but you must also do a little more coding. You must
+create the following function and call using requestAnimationFrame it at the end of your code:
+
+    function renderFunction() {
+        sceneName.render(fps);
+        requestAnimationFrame(renderFunction);
+    }
+    requestAnimationFrame(renderFunction);
+
+where renderFunction is the function name of your choice, sceneName is the variable name of the scene, and fps is the frames per
+second to be drawn at. What this does is call the function renderFunction, and then render the scene. The line
+"requestAnimationFrame(renderFunction);" requests the browser for a new frame to be drawn, and then calls the function with the
+drawing code, in which case is renderFunction, and the drawing code is "sceneName.render(fps);"
+
+
+Section 5. Credits
+
+    This code was created by me, except for the bind() function, with which the respective authors are in the engine's code. You
+may use and modify the engines code as you please, but you must give credit to the original code.
+
+
+
+Canvas5 v1.0-release
+canvas5-relase1.0.js
+(c) 2016 Sergix
