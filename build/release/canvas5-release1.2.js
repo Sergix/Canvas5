@@ -234,7 +234,7 @@ function Scene(domElement) {
     };
 }
 
-function Sprite(image=null) {
+function Sprite(image) {
     this.x = 0;
     this.y = 0;
     this.speed = 0;
@@ -245,7 +245,7 @@ function Sprite(image=null) {
     this.canMove = true;
     this.oldX = 0;
     this.oldY = 0;
-    this.image = image;
+    this.image = image !== undefined ? image : null;
     this.width = this.image === null ? 0 : this.image.image.width;
     this.height = this.image === null ? 0 : this.image.image.height;
     this.boundaries = null;
@@ -463,32 +463,33 @@ function Circle(size) {
 
 function Client(url) {
     this.url = url;
-    this.server = new WebSocket(this.url);
-    this.currentData = null;
+    server = new WebSocket(url);
+    currentData = null;
     this.event = function (event) {
-        this.currentData = event.data;
+        currentData = event;
     };
     this.sendMessage = function (data) {
-        this.server.send(data);
+        server.send(data);
     };
     this.getMessage = function () {
-        return this.currentData;
+        return currentData.data;
     };
-    (function () {
+    this.setup = function () {
         console.warn("Canvas5 WebSocket implementation is currently very limited and buggy!");
 
-        this.server.onopen = this.event;
-        this.server.onclose = this.event;
-        this.server.onmessage = this.event;
-        this.server.onerror = this.event;
-    })();
+        server.onopen = this.event;
+        server.onclose = this.event;
+        server.onmessage = this.event;
+        server.onerror = this.event;
+    };
+    this.setup();
 }
 
 function LocalStorageSet() {
     this.keyList = [];
     this.newItem = function (key, value) {
         localStorage.setItem(key, value);
-        this.list.push(key);
+        this.keyList.push(key);
     };
     this.getItem = function (key) {
         return localStorage.getItem(key);
@@ -510,7 +511,7 @@ function LocalStorageSet() {
 }
 
 function AudioElement(domElement, src) {
-    this.domElement = document.createElement('audio');
+    this.domElement = domElement.createElement('audio');
     this.src = src;
     this.play = function () {
         this.domElement.play();
@@ -528,14 +529,15 @@ function AudioElement(domElement, src) {
     this.setVolume = function (volume) {
         this.domElement.volume = volume;
     };
-    (function () {
-        domElement.setAttribute('src', this.src);
-    })();
+    this.setup = function () {
+        this.domElement.setAttribute('src', this.src);
+    };
+    this.setup();
 }
 
-function MessageBox(text, x=0, y=0) {
-    this.x      = x;
-    this.y      = y;
+function MessageBox(text, x, y) {
+    this.x      = x !== undefined ? x : 0;
+    this.y      = y !== undefined ? y : 0;
     this.text   = text;
     this.font   = "12pt sans-serif";
     this.color  = "black";
@@ -617,3 +619,31 @@ function distance(x0, y0, x1, y1) {
 function bind(scope, fn) {
     return function () { fn.apply(scope, arguments); };
 };
+
+/*function ParticleField(entity) {
+    this.particle = entity;
+    this.entityList = [];
+    this.explosion = function (n, context) {
+        var directionX = -100, directionY = -100, temp = null;
+        while (n > 0) {
+            temp = this.particle;
+            temp.vx = directionX;
+            temp.vy = directionY;
+            this.entityList.push(temp);
+            directionY += 1;
+            directionX += 1;
+            n--;
+        }
+        var i;
+        for (i = 0; i < this.entityList.length; i++)
+            this.entityList[i].update(context, 60);
+    };
+    this.update = function (context, fps) {
+        var i;
+        for (i = 0; i < this.entityList.length; i++)
+            this.entityList[i].update(context, fps);
+    };
+    this.draw = function (context) {
+        
+    };
+}*/
