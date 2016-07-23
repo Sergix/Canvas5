@@ -271,7 +271,8 @@ where audio is the variable name of your choice, domElement is the object model 
 "file.mp3" is the audio file directory. Once you have the object, you can use the play() function, the pause()
 function, and the stop() function, each which is self-explanatory in function. The AudioElement object has a
 domElement property, which is the object of the page where the audio element is. The src property contains the
-source of the audio file's directory. The object also has a setTime(time) and setVolume(volume) function.
+source of the audio file's directory. The object also has a setTime(time) and setVolume(volume) function. The object
+also has a setup() function, which is automatically called upon object creation.
 
 
 Section 6b. LocalStorageSet object
@@ -299,11 +300,11 @@ Client object, do the following:
     var connection = new Client("ws://1234.com");
 
 where connection is the variable name of your choice, and "ws://1234.com" is the URL of the WebSocket. Note: ALL
-WebSocket URLs use the "ws://" protocol prefix. This will establish a connection in the server property. The URL is
+WebSocket URLs use the "ws://" protocol prefix. This will establish a connection with the server. The URL is
 stored in the url property. The Client object has a sendMessage(message) function, which will send the data in
-message to the WebSocket. You can also call getMessage(), which returns the last message recieved, also stored in
-the currentData property. The Cleint object also has an event(event) function, which sets the currentData property
-to whatever was stored in event.data.
+message to the WebSocket. You can also call getMessage(), which returns the last message recieved.The Cleint object 
+also has an event(event) function, which sets the currentData variable to whatever was stored in event.data. The
+object also has a setup() function, which is automatically called upon object creation.
 
 
 Section 6d. Color objects
