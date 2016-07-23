@@ -1,0 +1,412 @@
+Developer notes on build release1.2 of Canvas5, the JavaScript HTML5 Canvas 2-D Game Engine
+
+Contents
+1. About
+2. Changelog
+3. Creating a Scene
+   a. Pixel Manipulation
+   b. Scene properties
+4. Creating a sprite
+   a. GameImage object
+   b. SpriteSheet object
+   c. MessageBox object
+   d. Sprite properties
+5. Drawing the scene
+6. Miscellaneous Features
+   a. AudioElement object
+   b. LocalStorageSet object
+   c. Client object
+   d. Color objects
+      1. RGBSet object
+      2. RGBASet object
+      3. HSLSet object
+      4. HSLASet object
+   e. Primitive Shape objects
+      1. Circle object
+      2. Rectangle object
+7. Credits
+
+
+Section 1. About
+
+    Canvas5 is an easy-to-use API for the HTML5 Canvas using JavaScript. It can be used to minimize literally hundreds of lines of
+code into just a few lines. It was completely written by me, Sergix. It was originally intended for my own use as an HTML5 Canvas
+game developer but it is available now as open-source code. The current buildof Canvas5 includes the basic functions
+to create and set up a game. It can be used as either an interface in its entirety or simply as a tool to create and
+store sprites or other objects. Feel free to create code that is compatible with Canvas5 such as "plugins" or other 
+add-ons, or for incorporating Canvas5's objects into your own scripts.
+
+
+Section 2. Changelog
+
+    - Added audio playing
+    - Added Local Storage saving mechanisms
+    - Added ability to connect to a WebSocket server
+    - Added various types of Color constructors
+    - Added a couple constructors for primitive shapes
+    - Added mouse functions to Sprite
+    - Optimized collision detection
+    - Added scene pixel manipulation
+
+
+Section 3. Creating a Scene
+
+    Creating a Scene in Canvas5 only takes one line of code, but this Scene object is very powerful and has an extensive list of
+modifiable properties. To create a Scene object, do the following:
+
+        var sceneName = new Scene(domElement);
+
+while replacing "sceneName" with the variable name of your choice, and "domElement" with the DOM object that the canvas is located
+in. If you don't know what to put or don't want to specify, just put "document".
+
+        var sceneName = new Scene(document);
+
+In your HTML, the "id" of the canvas that is going to be used MUST be "CanvasGame" or it will be unrecognized by the script.
+
+        <canvas id="CanvasGame"></canvas>
+
+The size and other CSS properties of the canvas tag do not matter. You can apply whatever you want to it.
+
+Here I would like to describe a new advanced feature to release1.1: actions. Actions are functions created by the 
+programmer that will be called if the other function returns true. Example:
+
+    sceneName.newAction(condition, action);
+
+where sceneName is the variable name of your choice, and condition and action are each functions. "condition" is a
+user-defined function that MUST return either true (1) or false (0). If not, the program will function incorrectly.
+If the result from calling condition() is true, then the defined "action" function will be called. You can put
+whatever code you like inside your action() function, and it does not have to return a value.
+
+
+Section 3a. Pixel Manipulation
+
+    Pixel Manipulation is a new feature in Canvas5, and it gives the programmer the ability to directly modify the
+color values of every pixel on the canvas. However, it must be called every time the scene is rendered. Preferably,
+you should put the call to your scene's pixel editing function, modifyColors(rgba, area) in a scene action so that
+it is called automatically after the rendering. The modifyColors(rgba, area) function works so that the canvas's
+pixels will be changed by "rgba" amount in "area" area, where rgba is a RGBSet or RGBASet object, and area is an
+array containing four properties: x, y, width, height. This tells the function where to change the pixels. Note that
+it will modify the pixels by adding the values specified in rgba, not by directly setting them.
+
+
+Section 3b. Scene properties
+
+    The Scene object contains an extensive list of properties that can be used for different purposes. Here is a complete list:
+
+    domElement               : DOM object that the canvas tag is contained in. Used on creation of the object.
+    canvas                   : DOM object of the canvas.
+    context                  : context variable of the canvas that is used to draw the scene on the canvas.
+    width                    : width of the canvas.
+    height                   : height of the canvas.
+    sprites                  : array of sprites to be updated and drawn on the canvas.
+    actionList               : array containing added actions to be checked.
+    colorChangeList          : array containing how much the pixels' values should be changed.
+    colorList                : array containing the current color values after last call to modifyColors().
+    imageData                : array containing the image data after last call to modifyColors().
+  playerSprite               : Sprite object of the player.
+    background               : image used as the background drawn on the canvas.
+backgroundColor              : fallback if background variable is unspecified, or if user simply wants color background instead of image.
+    showInfo                 : tells renderer whether to display rendering info or not.
+    modifyColors(rgba, area) : modifies the pixels on the canvas.
+    getColors()              : returns colorList[]
+newAction(condition, action) : adds a new action to actionList[]
+    add()                    : adds a sprite to the sprites array
+    remove(obj)              : removes the "obj" sprite from the sprite array.
+    update()                 : updates the sprites' collision detection.
+    render(fps)              : draws the scene and all its objects at "fps" frames per second.
+
+
+Section 4. Creating a sprite
+
+    The Sprite object is an object that defines a entity that can be moved on the screen. To create a Sprite object, type the
+following code:
+
+    var spriteName = new Sprite(image);
+
+where "spriteName" is the variable name of your choice and "image" is the image used to draw the sprite. The image must be a
+GameImage object, which is described below. Once a sprite is created, you must add it to the scene for it to be visible. The
+sprite is drawn based on its x and y values, which you can change either by changing the property directly:
+
+    spriteName.x = 0;
+    spriteName.y = 0;
+
+replacing spriteName with the name of the variable, and 0 with the values of your choice. You can also change the position using
+the built-in function:
+    
+    spriteName.setPosition(0, 0);
+
+with the same rules applying as above. The first argument is the x-position and the second argument is the y-position.
+
+
+Section 4a. GameImage object
+
+    The GameImage object is the object used by all of the image-related functions in the engine, which consist of most of the
+drawing and rendering-related functions. To create a GameImage object, type the following:
+
+    var imageName = new GameImage(imageFile);
+
+where "imageName" is the variable name of your choice and "imageFile" is the filepath of the image. For example, let us say I
+want to use an image named "image" located in the same folder as your script. You would use "image.png" as the filepath, also
+replacing "png" with the image format extension. GameImage only has two properties, image and src, where image is the image
+object itself and src is the filepath of the image.
+
+
+Section 4b. SpriteSheet object
+
+    The SpriteSheet object is simply a collection of GameImage(s) used by Sprites to create an animation. To create
+a SpriteSheet, do the following:
+
+    var sheetName = new SpriteSheet( [ image1, image2, image3] );
+
+where "sheetName" is the variable name of your choice, and "image(1,2,3)" are each GameImage objects. You add this
+to your sprite using the spriteSheet attribute. Important note: SpriteSheet objects can be used ONLY with Sprites,
+and they do not work as a Scene background. The SpriteSheet object only has one attribute names "images", which is
+simply the array of GameImages.
+
+
+Section 4c. MessageBox object
+
+    An interesting thing about the Sprite object is that you can give it a visible name to be displayed in the game. To do this,
+you must use the setName function of your variable, and let the argument be a MessageBox:
+
+    var msgName = new MessageBox("Player", 0, 0);
+    spriteName.setName(msgName);
+
+where msgName are the variable names of your choice, "Player" as the text of your choice, and 0 being the x and y positions of
+your choice. If you are using the variable as a name for a sprite, you can leave out the last two arguments to MessageBox:
+
+    var msgName = new MessageBox("Player");
+
+where the same rules apply as above. MessageBox can also act as a sprite, and if you are not using it as a sprite name you
+must add it to your scene using the Scene object's add() function, just as if adding a sprite. The MessageBox object has an x
+and y property (although you must directly set them). It also has the text property which contains the text. You can set the
+font and size of the text using the font property in the following format: "12pt Arial", with 12 being the number of your choice
+(although 12 is default), and with Arial being the font name of your choice. You can also change the color of the text with the 
+color property. The text also has an alwaysActive property that can be set (default is false), and it tells the engine whether
+to draw it automatically or not. MessageBox also has three functions: update, active, and draw. update(context, fps) updates the text
+using the context provided and at fps frames per second. active(context) tells the object to draw itself now, and draw(context)
+draws the text using the context provided.
+
+
+Section 4d. Sprite properties
+
+    The Sprite object contains an extensive list of properties that can be used for different purposes. Here is a complete list:
+
+    x                    : x-position of the sprite.
+    y                    : y-position of the sprite.
+    speed                : how fast to set the velocity when moving.
+    vx                   : velocity of the object along the x-axis.
+    vy                   : velocity of the object along the y-axis.
+    ax                   : acceleration of the object along the x-axis.
+    ay                   : acceleration of the object along the y-axis.
+    canMove              : used in collision detection.
+    oldX                 : used in collision detection.
+    oldY                 : used in collision detection.
+    image                : GameImage used to draw the sprite.
+    width                : width of the image property.
+    height               : height of the image property.
+    boundaries           : sets the boundaries of the object as to how far on/off-screen it can go in pixels.
+    collide              : run collision detection on the sprite.
+    name                 : MessageBox used to draw a gamertag-like text block above the sprite.
+    spriteSheet          : SpriteSheet object used for animation.
+    frame                : current frame of the animation.
+    changeFrame          : decides whether to change the SpriteSheet frame or not.
+    activeKeys           : array used for isKeyPressed().
+    moveLeft             : used in collision detection.
+    moveRight            : used in collision detection.
+    moveDown             : used in collision detection.
+    moveUp               : used in collision detection.
+    mousePositionX       : current X-position of the mouse.
+    mousePositionY       : current Y-position of the mouse.
+    clicked              : value is true if left mouse button is down over the sprite.
+    activeButtons        : list of active mouse buttons.
+    isKeyPressed(key)    : checks from activeKeys[] if the requested key is active.
+ isButtonPressed(button) : checks from activeButtons[] if the requested button is active.
+    near(sprite, units)  : returns true if sprite is "units" units away from "sprite".
+    setName(text)        : sets the name property using the text argument.
+    setPosition(x, y)    : sets the position of the sprite.
+    setVelocity(vx, vy)  : sets the velocity of the sprite.
+    setAccel(ax, ay)     : sets the acceleration of the sprite.
+    addBasicControls()   : adds basic keyboard controls to the sprite.
+    addMouseListener()   : adds a mouse listener function.
+    onMouseMove(evt)     : responds to mouse events if listener is active.
+    onMouseDown(evt)     : responds to mouse events if listener is active.
+    onMouseUp(evt)       : responds to mouse events if listener is active.
+    onKeyDown(evt)       : responds to keyboard events if controls are set.
+    onKeyUp(evt)         : responds to keyboard events if controls are set.
+    update(context, fps) : updates the sprite.
+    draw(context)        : draws the sprite.
+
+
+Section 5. Drawing the scene
+
+    To draw the scene, you must call the render function of your scene, but you must also do a little more coding. You must
+create the following function and call using requestAnimationFrame it at the end of your code:
+
+    function renderFunction() {
+        sceneName.render(fps);
+        requestAnimationFrame(renderFunction);
+    }
+    requestAnimationFrame(renderFunction);
+
+where renderFunction is the function name of your choice, sceneName is the variable name of the scene, and fps is the frames per
+second to be drawn at. What this does is call the function renderFunction, and then render the scene. The line
+"requestAnimationFrame(renderFunction);" requests the browser for a new frame to be drawn, and then calls the function with the
+drawing code, in which case is renderFunction, and the drawing code is "sceneName.render(fps);"
+
+
+Section 6. Miscellaneous Features
+
+    This section describes different features that do not necessarily fit into a specific category.
+
+
+Section 6a. AudioElement object
+
+    AudioElement creates a new audio playback structure that can be used to play audio when you call the object's
+play() function. A new AudioElement object can be created by doing the following:
+
+    var audio = new AudioElement(domElement, "file.mp3");
+
+where audio is the variable name of your choice, domElement is the object model where the element is to be put, and
+"file.mp3" is the audio file directory. Once you have the object, you can use the play() function, the pause()
+function, and the stop() function, each which is self-explanatory in function. The AudioElement object has a
+domElement property, which is the object of the page where the audio element is. The src property contains the
+source of the audio file's directory. The object also has a setTime(time) and setVolume(volume) function. The object
+also has a setup() function, which is automatically called upon object creation.
+
+
+Section 6b. LocalStorageSet object
+
+    The LocalStoragSet object can be used to store different values in the browser's Local Storage mechanism, which
+saves the data as a key/value pair and can be accessed even if the browser was closed (note: the browser, however,
+may auto-clear the entire Local Storage if closed). Local Storage is similar to Cookies. You van create a new
+LocalStorageSet object by doing the following:
+
+     var storage = new LocalStorageSet();
+
+where storage is the variable name of your choice. Once you have created the object, you can add values using the
+newItem(key, value) function. You can then access a key in Local Storage by using the getItem(key) function, which
+gets the value in Local Storage that has the corresponding key and has the function return it. You can also use the
+getAllItems() function, which returns an array of all the values specified in the specific object. If you want, you
+can delete all key/value pairs associated with the specific object by calling the clear() function. You can also
+directly access all values you have set in the object by using the keyList[] parameter.
+
+
+Section 6c. Client object
+
+    The Client object can be used to establish a connection with a known WebSocket given the address. To create a
+Client object, do the following:
+
+    var connection = new Client("ws://1234.com");
+
+where connection is the variable name of your choice, and "ws://1234.com" is the URL of the WebSocket. Note: ALL
+WebSocket URLs use the "ws://" protocol prefix. This will establish a connection with the server. The URL is
+stored in the url property. The Client object has a sendMessage(message) function, which will send the data in
+message to the WebSocket. You can also call getMessage(), which returns the last message recieved.The Cleint object 
+also has an event(event) function, which sets the currentData variable to whatever was stored in event.data. The
+object also has a setup() function, which is automatically called upon object creation.
+
+
+Section 6d. Color objects
+
+    The new release of Canvas5 includes a few useful color objects which store different types of color data. Each
+has a getAsString() function, which returns the data as a CSS string.
+
+
+Section 6d1. RGBSet object
+
+    The RGBSet constructor is used for storing Red-Green-Blue color values. You can create an RGBSet object by doing
+the following:
+
+    var colors = new RGBSet(r, g, b);
+
+where colors is the variable name of your choice, r is the amount of red, g is the amount of green, and b is the
+amount of blue. Each of these are stored in the r, g, and b properties, respectively. The RGBSet object also has
+an "a" property, which stores the transparency as an "alpha" value. This is set to 255 and is only used by the pixel
+manipulation function, although it can be modified.
+
+
+Section 6d2. RGBASet object
+
+    The RGBASet constructor is used for storing Red-Green-Blue-Alpha color values. You can create an RGBASet object 
+by doing the following:
+
+    var colors = new RGBASet(r, g, b, a);
+
+where colors is the variable name of your choice, r is the amount of red, g is the amount of green, b is the
+amount of blue, and a is the amount of alpha. Each of these are stored in the r, g, b, and a properties,
+respectively. Each of these properties can be modified.
+
+
+Section 6d3. HSLSet object
+
+    The HSLSet constructor is used for storing Hue-Saturation-Lightness color values. You can create an HSLSet
+object by doing the following:
+
+    var colors = new HSLSet(h, s, l);
+
+where colors is the variable name of your choice, h is the hue, s is the amount of saturation, and l is the lightness. 
+Each of these are stored in the h, s, and l properties, respectively. The HSLSet object also has an "a" property,
+which stores the transparency as an "alpha" value. This is set to 255 and is only used as a placeholder for other
+functions, although it can be modified.
+
+
+Section 6d4. HSLASet object
+
+    The HSLASet constructor is used for storing Hue-Saturation-Lightness-Alpha color values. You can create an
+HSLASet object by doing the following:
+
+    var colors = new HSLASet(h, s, l, a);
+
+where colors is the variable name of your choice, h is the hue, s is the amount of saturation, l is the lightness,
+and a is the amount of alpha. Each of these are stored in the h, s, l, and a properties,
+respectively. Each of these properties can be modified.
+
+
+Section 6e. Primitive Shape objects
+
+    The latest version of Canvas5 comes with the ability to construct a couple of primitive shapes.
+
+
+Section 6e1. Circle object
+
+    The Circle object can be used to create a basic circle. To create a new Circle object, do the following:
+
+    var shape = new Circle(size);
+
+where shape is the variable name of your choice, and size is the radius of the circle. The Circle object has a
+setPosition(x, y) function which sets the x and y properties of the object. The object also has a vx and vy
+property for velocity. You can change the size of the circle by editing the radius property, and the color by
+editing the color property. You can give the object a visible border by editing the border property (as a color),
+and you can set the width of the border by changing the borderWidth property. The Rectangle object has two other
+functions, update(context, fps) and draw(context), which are self-explanatory in function.
+
+
+Section 6e2. Rectangle object
+
+    The Rectangle object can be used to create a rectangle or a square. To create a new Rectangle object, do the
+following:
+
+    var shape = new Rectangle(width, height);
+
+where shape is the variable name of your choice, width is the width of the rectangle, and height is the height of
+the rectangle. The Rectangle object has a setPosition(x, y) function which can be used to set the x and y
+properties of the object. The object also has a vx and vy property which can be used to change the velocity of the
+object. You can change the width and height property as well. You can set the color of the rectangle by changing the
+color property. If you want, you can give it a visible border by editing the border property (as a color), and you
+can set the width of the border by changing the borderWidth property. The Circle object has two other functions,
+update(context, fps) and draw(context), which are self-explanatory in function.
+
+
+Section 7. Credits
+
+    This code was created by me, except for the bind() function, with which the respective authors are in the
+engine's code. You may use and modify the engines code as you please, but you must give credit for modifying the
+original. This code can be found on GitHub at https://github.com/Sergix7440/Canvas5, and the code found there has
+been put under the GNU Public License.
+
+
+
+Canvas5 v1.1-release
+canvas5-release1.1.js
+(c) 2016 Sergix
