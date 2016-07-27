@@ -3,11 +3,12 @@
 */
 
 /*
-* Game Engine release1.2 Original Full Script
+* Game Engine dev1.3 Original Full Script
 * (c) 2016 Sergix
 */
 
-console.info("Canvas5 JavaScript Engine; version release1.2; (c) 2016 Sergix");
+console.info("Canvas5 JavaScript Engine; version dev1.3; (c) 2016 Sergix");
+console.warn("Using development build! May contain unknown errors!");
 
 function Scene(domElement) {
     this.domElement      = domElement;
@@ -17,6 +18,7 @@ function Scene(domElement) {
     this.height          = this.canvas.height;
     this.sprites         = [];
     this.actionList      = [];
+    this.menuList        = [];
     this.changeColorList = [0, 0, 0, 0];
     this.colorList       = [null, null, null, null];
     this.imageData       = null;
@@ -93,6 +95,9 @@ function Scene(domElement) {
     };
     this.add = function (sprite) {
         this.sprites.push(sprite);
+    };
+    this.addMenu = function (menu) {
+        this.menuList.push(menu);
     };
     this.remove = function (sprite) {
         var index = this.sprites.indexOf(sprite);
@@ -230,7 +235,10 @@ function Scene(domElement) {
         }
 
         for (i = 0; i < this.actionList.length; i++)
-            if(this.actionList[i].condition()) this.actionList[i].action();
+            if (this.actionList[i].condition()) this.actionList[i].action();
+
+        for (i = 0; i < this.menuList.length; i++)
+            this.menuList[i].update(this.context, fps);
     };
 }
 
@@ -263,6 +271,9 @@ function Sprite(image) {
     this.mousePositionY = 0;
     this.clicked = false;
     this.activeButtons = [];
+    this.getMouseData = function () {
+        return [this.mousePositionX, this.mousePositionY];
+    };
     this.isKeyPressed = function (key) {
         if (this.activeKeys.indexOf(key) > -1)
             return 1;
@@ -304,6 +315,7 @@ function Sprite(image) {
     this.addMouseListener = function (domElement) {
         domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
         domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
     };
     this.onMouseMove = function (evt) {
         this.mousePositionX = evt.pageX;
@@ -404,6 +416,145 @@ function Sprite(image) {
     };
 }
 
+function GameMenu() {
+    this.x = 0;
+    this.y = 0;
+    this.elements = [];
+    this.alwaysActive = false;
+    this.collide = false;
+    this.background = null;
+    this.backgroundColor = new RGBSet(255, 255, 255);
+    this.width = 200;
+    this.height = 200;
+    this.editMode = false;
+    this.mousePositionX = 0;
+    this.mousePositionY = 0;
+    this.dragging = false;
+    this.add = function (element) {
+        this.elements.push(element);
+    };
+    this.addMouseListener = function (domElement) {
+        domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
+        domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+    };
+    this.onMouseMove = function (evt) {
+        this.mousePositionX = evt.pageX;
+        this.mousePositionY = evt.pageY;
+        if (this.dragging !== false) {
+            this.dragging.x = this.mousePositionX;
+            this.dragging.y = this.mousePositionY;
+        }
+    };
+    this.onMouseDown = function (evt) {
+        switch (evt.button) {
+            case 0: /*left*/
+                for (var i = 0; i < this.elements.length; i++) {
+                    if (this.elements[i].font !== undefined) {
+                        if (this.mousePositionX >= this.elements[i].x && this.mousePositionX <= this.elements[i].x + 100 && this.mousePositionY >= this.elements[i].y && this.mousePositionY <= this.elements[i].y + 100)
+                            this.dragging = this.elements[i];
+                        break;
+                    }
+                    if (this.mousePositionX >= this.elements[i].x && this.mousePositionX <= this.elements[i].x + this.elements[i].width && this.mousePositionY >= this.elements[i].y && this.mousePositionY <= this.elements[i].y + this.elements[i].width)
+                        this.dragging = this.elements[i];
+                }
+                break;
+        }
+    };
+    this.onMouseUp = function (evt) {
+        this.dragging = false;
+    };
+    this.update = function (context, fps) {
+        if (this.editMode !== false)
+            this.addMouseListener(this.editMode);
+        if (this.dragging !== false) {
+            this.dragging.x = this.mousePositionX;
+            this.dragging.y = this.mousePositionY;
+        }
+        if (this.alwaysActive)
+            this.draw(context);
+    };
+    this.active = function (scene) {
+        if (this.editMode !== false)
+            this.addMouseListener(this.editMode);
+        if (this.dragging !== false) {
+            this.dragging.x = this.mousePositionX;
+            this.dragging.y = this.mousePositionY;
+        }
+        this.draw(scene.context);
+    };
+    this.draw = function (context) {
+        context.fillStyle = this.backgroundColor.getAsString();
+        if (this.background !== null)
+            context.drawImage(this.background.image, this.x, this.y, this.width, this.height);
+        else
+            context.fillRect(this.x, this.y, this.width, this.height);
+        
+        for (var i = 0; i < this.elements.length; i++) {
+            this.elements[i].update(context);
+            if (this.dragging !== false) {
+                context.fillStyle = "white";
+                context.font = "14pt sans-serif";
+                context.fillText(this.elements[i].x + ", " + this.elements[i].y, this.elements[i].x, this.elements[i].y - 30);
+            }
+        }
+    };
+}
+
+function Button(text, rect) {
+    this.x = 0;
+    this.y = 0;
+    this.text = text;
+    this.rect = rect;
+    this.added = false;
+    this.mousePositionX = 0;
+    this.mousePositionY = 0;
+    this.clicked = false;
+    this.width = this.rect.width;
+    this.height = this.rect.height;
+    this.addMouseListener = function (domElement) {
+        domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
+        domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+    };
+    this.onMouseMove = function (evt) {
+        this.mousePositionX = evt.pageX;
+        this.mousePositionY = evt.pageY;
+    };
+    this.onMouseDown = function (evt) {
+        switch (evt.button) {
+            case 0: /*left*/ if (this.mousePositionX >= this.x && this.mousePositionX <= this.x + this.rect.width && this.mousePositionY >= this.y && this.mousePositionY <= this.y + this.rect.width) this.clicked = true; break;
+        }
+    };
+    this.onMouseUp = function (evt) {
+        this.clicked = false;
+    };
+    this.setPosition = function (x, y) {
+        this.x = x;
+        this.y = y;
+    };
+    this.update = function (context) {
+        this.rect.draw(context);
+        if (this.mousePositionX >= this.x && this.mousePositionX <= this.x + this.rect.width && this.mousePositionY >= this.y && this.mousePositionY <= this.y + this.rect.height) {
+            this.rect.draw(context, new RGBASet(this.rect.color.r+50, this.rect.color.g+50, this.rect.color.b+50, this.rect.color.a));
+            this.added = true;
+        }
+
+        this.rect.setPosition(this.x, this.y);
+
+        this.text.x = (this.rect.width / 2) + this.rect.x;
+        this.text.y = this.rect.y + 40;
+        for (var i = 0; i < this.text.text.length / 2; i++) {
+            this.text.x -= 14;
+        }
+
+        this.draw(context);
+    };
+    this.draw = function (context) {
+        this.text.draw(context);
+    };
+}
+
 function Rectangle(width, height) {
     this.x = 0;
     this.y = 0;
@@ -411,7 +562,7 @@ function Rectangle(width, height) {
     this.vy = 0;
     this.width = width;
     this.height = height;
-    this.color = "white";
+    this.color = new RGBASet(100, 100, 100, 1);
     this.border = this.color;
     this.borderWidth = 2;
     this.setPosition = function (x, y) {
@@ -423,9 +574,14 @@ function Rectangle(width, height) {
         this.y += this.vy / fps;
         this.draw(context);
     };
-    this.draw = function (context) {
-        context.fillStyle = this.color;
-        context.strokeStyle = this.border;
+    this.draw = function (context, color) {
+        if (color !== undefined) {
+            context.fillStyle = color.getAsString();
+            context.strokeStyle = this.border.getAsString();
+        } else {
+            context.fillStyle = this.color.getAsString();
+            context.strokeStyle = this.border.getAsString();
+        }
         context.fillRect(this.x, this.y, this.width, this.height);
         context.strokeRect(this.x, this.y, this.width, this.height);
     };
@@ -540,8 +696,12 @@ function MessageBox(text, x, y) {
     this.y      = y !== undefined ? y : 0;
     this.text   = text;
     this.font   = "12pt sans-serif";
-    this.color  = "black";
+    this.color  = new RGBASet(100, 100, 100, 1);
     this.alwaysActive = false;
+    this.setPosition = function (x, y) {
+        this.x = x;
+        this.y = y;
+    };
     this.update = function (context, fps) {  
         if (this.alwaysActive !== false)
             this.draw(context);
@@ -550,7 +710,7 @@ function MessageBox(text, x, y) {
         this.draw(scene.context);
     };
     this.draw = function (context) {
-        context.fillStyle = this.color;
+        context.fillStyle = this.color.getAsString();
         context.font = this.font;
         context.fillText(this.text, this.x, this.y);
     };
@@ -607,10 +767,18 @@ function HSLASet(h, s, l, a) {
     }
 }
 
+function isColliding(xy1, xy2) {
+    if (xy1.x >= xy2.x && xy1.x <= xy2.x + xy2.width && xy1.y >= xy2.y && xy1.y <= xy2.y + xy2.height)
+        return true;
+    else
+        return false;
+}
+
+
 function distance(x0, y0, x1, y1) {
     var dx = x1 - x0, dy = y1 - y0;
     return Math.sqrt((dx * dx) + (dy * dy));
-};
+}
 
 /*
 * Bind() function
