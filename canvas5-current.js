@@ -7,11 +7,18 @@
 * (c) 2016 Sergix
 */
 
+
+// Define Canvas5 version
+
 var c5version = "dev1.3.1";
 
+// On script load, log info to console
+
 window.onload = function (evt) {
+
     console.info("Canvas5 JavaScript Engine; version" + c5version + "; (c) 2016 Sergix");
     console.warn("Using development build! May contain unknown errors!");
+
 };
 
 /*
@@ -246,7 +253,7 @@ function Scene(domElement) {
                     continue;
                 }
 
-                // Hmmm... can't remember why I put this here.
+                // Set all values to true
                 this.playerSprite.moveLeft = true;
                 this.playerSprite.moveRight = true;
                 this.playerSprite.moveDown = true;
@@ -879,8 +886,8 @@ function Sprite(image) {
         // If we are going to change the animation frame
         if (this.changeFrame)
 
-            // Add one to the frame
-            this.frame += 1;
+            // Increment frame
+            this.frame++;
 
         // If false, stay silent
 
@@ -1589,6 +1596,42 @@ function MessageBox(text, x, y) {
 
         // Draw the text at (x,y)
         context.fillText(this.text, this.x, this.y);
+
+    };
+
+}
+
+/*
+    Dialogue object constructor
+    desc: Uses a MessageBox array to loop through as dialogue
+*/
+
+function Dialogue(text) {
+
+    this.text = text;
+    this.index = 0;
+    
+    // Go to next line of dialogue
+    this.next = function () {
+
+        // Increment index
+        this.index++;
+
+        // If index is over dialogue length
+        if (this.index >= this.text.length)
+
+            // Then set index to 0
+            this.index = 0;
+
+        // If false, stay silent
+
+    }
+
+    // Update the current text
+    this.update = function (context, fps) {
+
+        // Update and draw the text
+        this.text[this.index].update(context, fps);
 
     };
 
