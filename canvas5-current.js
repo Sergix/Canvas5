@@ -28,8 +28,7 @@ window.onload = function (evt) {
 
 function Scene(domElement) {
 
-    this.domElement = domElement;
-    this.canvas = this.domElement.getElementById("CanvasGame");
+    this.canvas = domElement;
     this.context = this.canvas.getContext("2d");
     this.width = this.canvas.width;
     this.height = this.canvas.height;
@@ -350,7 +349,7 @@ function Scene(domElement) {
     };
 
     // Render the current scene and all its current and visible objects
-    this.render = function (fps) {
+    this.render = function () {
 
         // Call update
         this.update();
@@ -371,17 +370,17 @@ function Scene(domElement) {
 
         // Loop through sprites and update each
         for (i = 0; i < this.sprites.length; i++)
-            this.sprites[i].update(this.context, fps);
+            this.sprites[i].update(this.context);
 
         // Update the player's sprite
-        this.playerSprite.update(this.context, fps);
+        this.playerSprite.update(this.context);
 
-        // If showInfo is true, display information about the scene (FPS, n of sprites being rendered)
+        // If showInfo is true, display information about the scene (n of sprites being rendered)
         if (this.showInfo) {
 
             this.context.font = "13pt sans-serif";
             this.context.color = "black";
-            this.context.fillText(fps + " FPS; " + (this.sprites.length + 1) + " objects", 10, 20);
+            this.context.fillText("60 FPS; " + (this.sprites.length + 1) + " objects", 10, 20);
 
         }
 
@@ -398,7 +397,7 @@ function Scene(domElement) {
 
         // Loop through and update menus
         for (i = 0; i < this.menuList.length; i++)
-            this.menuList[i].update(this.context, fps);
+            this.menuList[i].update(this.context);
 
     };
 
@@ -426,10 +425,12 @@ function Polygon(vectors) {
     this.vectors = vectors;
     this.color = RGBSet(0, 0, 0);
     this.lineWidth = 1;
+    this.lineCap = "butt";
     this.fill = false;
+    this.shadow = null;
 
     // Dummy function, only used to be drawn from a scene
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // If vectors attribute is not an array
         if (typeof this.vectors !== "object") {
@@ -441,6 +442,14 @@ function Polygon(vectors) {
             return 0;
 
         } // If false, stay silent
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
+
+        // If false, stay silent
 
         // Draw the line
         this.draw(context);
@@ -457,6 +466,7 @@ function Polygon(vectors) {
         context.fillStyle = this.color.getAsString();
         context.strokeStyle = this.color.getAsString();
         context.lineWidth = this.width;
+        context.lineCap = this.lineJoin;
 
         // Draw the line using context paths
         context.beginPath();
@@ -481,6 +491,14 @@ function Polygon(vectors) {
         // End the path
         context.closePath();
 
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew this
+            this.shadow.disable(context);
+
+        // If false, stay silent
+
     };
 
 }
@@ -495,9 +513,18 @@ function Line(v1, v2) {
     this.vectors = [v1, v2];
     this.color = RGBSet(0, 0, 0);
     this.width = 1;
+    this.shadow = null;
 
     // Dummy function, only used to be drawn from a scene
-    this.update = function (context, fps) {
+    this.update = function (context) {
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
+
+        // If false, stay silent
 
         // Draw the line
         this.draw(context);
@@ -518,6 +545,14 @@ function Line(v1, v2) {
         context.stroke();
         context.closePath();
 
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew it
+            this.shadow.disable(context);
+
+        // If false, stay silent
+
     };
 
 }
@@ -531,9 +566,10 @@ function Curve(vectors, type) {
 
     this.vectors = vectors;
     this.type = "quadratic";
+    this.shadow = null;
 
     // Update the curve
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // If type is not valid
         if (this.type !== "quadratic" && this.type !== "bezier") {
@@ -556,6 +592,14 @@ function Curve(vectors, type) {
             return 0;
 
         } // If false, stay silent
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
+
+        // If false, stay silent
 
         // Draw the curve
         this.draw(context);
@@ -585,6 +629,14 @@ function Curve(vectors, type) {
         // Stroke and end the path
         context.stroke();
         context.closePath();
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew it
+            this.shadow.disable(context);
+
+        // If false, stay silent
 
     };
 
@@ -625,6 +677,7 @@ function Sprite(image) {
     this.mousePositionY = 0;
     this.clicked = false;
     this.activeButtons = [];
+    this.shadow = null;
 
     // Get the mouse data as set in mousePositionX and mousePositionY
     this.getMouseData = function () {
@@ -711,24 +764,24 @@ function Sprite(image) {
     };
 
     // Add basic keyboard controls to the sprite
-    this.addBasicControls = function (movementSpeed, domElement) {
+    this.addBasicControls = function (movementSpeed) {
 
         // Set the speed property of the sprite
         this.speed = movementSpeed;
 
         // Add event listeners to the provided DOM object
-        domElement.addEventListener('keydown', bind(this, this.onKeyDown), false);
-        domElement.addEventListener('keyup', bind(this, this.onKeyUp), false);
+        window.addEventListener('keydown', bind(this, this.onKeyDown), false);
+        window.addEventListener('keyup', bind(this, this.onKeyUp), false);
 
     };
 
     // Add an event listener for the mouse to the sprite
-    this.addMouseListener = function (domElement) {
+    this.addMouseListener = function () {
 
         // Add event listeners to the provided DOM object
-        domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
-        domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-        domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+        window.addEventListener('mousemove', bind(this, this.onMouseMove), false);
+        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
     };
 
     // Called if event listener is active
@@ -835,7 +888,7 @@ function Sprite(image) {
     };
 
     // Used to update the sprite's collision, position, and animation frame
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // Check to see if the spriteSheet property is null
         // (used on first call to update)
@@ -878,10 +931,10 @@ function Sprite(image) {
             this.moveUp = true;
 
         // Update the position and velocity
-        this.x += this.vx / fps;
-        this.y += this.vy / fps;
-        this.vx += this.ax / fps;
-        this.vy += this.vy / fps;
+        this.x += this.vx / 60;
+        this.y += this.vy / 60;
+        this.vx += this.ax / 60;
+        this.vy += this.vy / 60;
 
         // If we are going to change the animation frame
         if (this.changeFrame)
@@ -899,8 +952,17 @@ function Sprite(image) {
 
         // If false, stay silent
 
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
+
+        // If false, stay silent
+
         // Draw the sprite
         this.draw(context);
+
     };
 
     // Draw the sprite on the provided context
@@ -921,6 +983,15 @@ function Sprite(image) {
         this.name.x = this.x;
         this.name.y = this.y - 25;
         this.name.draw(context);
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew it
+            this.shadow.disable(context);
+
+        // If false, stay silent
+
     };
 }
 
@@ -954,12 +1025,12 @@ function GameMenu() {
     };
 
     // Add a mouse event listener to the menu
-    this.addMouseListener = function (domElement) {
+    this.addMouseListener = function () {
 
         // Add a listener to the provided DOM object
-        domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
-        domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-        domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+        window.addEventListener('mousemove', bind(this, this.onMouseMove), false);
+        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
 
     };
 
@@ -1035,7 +1106,7 @@ function GameMenu() {
     };
 
     // Updates the menu
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // If edit mode is enabled
         if (this.editMode !== false)
@@ -1136,12 +1207,12 @@ function Button(text, rect) {
     this.height = this.rect.height;
 
     // Add a mouse event listener to the button
-    this.addMouseListener = function (domElement) {
+    this.addMouseListener = function () {
 
         // Bind listener functions to mouse events using the provided DOM object
-        domElement.addEventListener('mousemove', bind(this, this.onMouseMove), false);
-        domElement.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-        domElement.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+        window.addEventListener('mousemove', bind(this, this.onMouseMove), false);
+        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
 
     };
 
@@ -1252,6 +1323,7 @@ function Rect(width, height) {
     this.color = new RGBASet(100, 100, 100, 1);
     this.border = this.color;
     this.borderWidth = 2;
+    this.shadow = null;
 
     // Set the rect's position to (x,y)
     this.setPosition = function (x, y) {
@@ -1263,11 +1335,17 @@ function Rect(width, height) {
     };
 
     // Upadte the rect using the provided context
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // Update the (x,y) using the set velocity
-        this.x += this.vx / fps;
-        this.y += this.vy / fps;
+        this.x += this.vx / 60;
+        this.y += this.vy / 60;
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
 
         // Draw the rect
         this.draw(context);
@@ -1296,6 +1374,12 @@ function Rect(width, height) {
         context.fillRect(this.x, this.y, this.width, this.height);
         context.strokeRect(this.x, this.y, this.width, this.height);
 
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew it
+            this.shadow.disable(context);
+
     };
 
 }
@@ -1315,6 +1399,7 @@ function Circle(size) {
     this.color = "white";
     this.border = this.color;
     this.borderWidth = 2;
+    this.shadow = null;
 
     // Set the position of the circle
     this.setPosition = function (x, y) {
@@ -1326,11 +1411,17 @@ function Circle(size) {
     };
 
     // Update the circle
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // Update the (x,y) property using the set velocity
-        this.x += this.vx / fps;
-        this.y += this.vy / fps;
+        this.x += this.vx / 60;
+        this.y += this.vy / 60;
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
 
         // Draw the circle
         this.draw(context);
@@ -1351,6 +1442,12 @@ function Circle(size) {
         context.closePath();
         context.fill();
         context.stroke();
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew it
+            this.shadow.disable(context);
 
     };
 
@@ -1481,9 +1578,9 @@ function LocalStorageSet() {
     desc: Creates a new HTML audio element that can be played using JavaScript
 */
 
-function AudioElement(domElement, src) {
+function AudioElement(src) {
 
-    this.domElement = domElement.createElement('audio');
+    this.domElement = document.createElement('audio');
     this.src = src;
 
     // Play the audio
@@ -1553,6 +1650,7 @@ function MessageBox(text, x, y) {
     this.text = text;
     this.font = "12pt sans-serif";
     this.color = new RGBASet(100, 100, 100, 1);
+    this.shadow = null;
     this.alwaysActive = false;
 
     // Set the position of the text using (x,y)
@@ -1565,7 +1663,15 @@ function MessageBox(text, x, y) {
     };
 
     // Update the text
-    this.update = function (context, fps) {
+    this.update = function (context) {
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
+
+        // If false, stay silent
 
         // If it is to be drawn automatically
         if (this.alwaysActive !== false)
@@ -1597,6 +1703,12 @@ function MessageBox(text, x, y) {
         // Draw the text at (x,y)
         context.fillText(this.text, this.x, this.y);
 
+        // If the user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it since we already drew the text
+            this.shadow.disable(context);
+
     };
 
 }
@@ -1610,7 +1722,7 @@ function Dialogue(text) {
 
     this.text = text;
     this.index = 0;
-    
+
     // Go to next line of dialogue
     this.next = function () {
 
@@ -1628,10 +1740,10 @@ function Dialogue(text) {
     }
 
     // Update the current text
-    this.update = function (context, fps) {
+    this.update = function (context) {
 
         // Update and draw the text
-        this.text[this.index].update(context, fps);
+        this.text[this.index].update(context);
 
     };
 
@@ -1752,6 +1864,42 @@ function HSLASet(h, s, l, a) {
         return "hsla(" + this.r + "," + this.g + "," + this.b + "," + (this.a > 1 ? 1 : this.a) + ")";
 
     }
+
+}
+
+/*
+    Shadow object constructor
+    desc: Creates a shadow that can be used on different objects
+*/
+
+function Shadow (offsetX, offsetY) {
+
+    this.offsetX = offsetX;
+    this.offsetY = offsetY;
+    this.color = new RGBASet(0, 0, 0, 0.75);
+    this.blur = 5;
+
+    // Enable the shadow in the context
+    this.enable = function (context) {
+
+        // Set context properties for the shadow
+        context.shadowOffsetX = this.offsetX;
+        context.shadowOffsetY = this.offsetY;
+        context.shadowColor = this.color.getAsString();
+        context.shadowBlur = this.blur;
+
+    };
+
+    // Disable the shadow in the context
+    this.disable = function (context) {
+
+        // Set all shadow values to 0 and make the shadow transparent
+        context.shadowOffsetX = 0;
+        context.shadowOffsetY = 0;
+        context.color = "rgba(0, 0, 0, 0)";
+        context.shadowBlur = 0;
+
+    };
 
 }
 
