@@ -9,11 +9,9 @@
 
 
 // Define Canvas5 version
-
-var c5version = "dev1.3.1";
+const c5version = "dev1.3.1";
 
 // On script load, log info to console
-
 window.onload = function (evt) {
 
     console.info("Canvas5 JavaScript Engine; version" + c5version + "; (c) 2016 Sergix");
@@ -428,6 +426,7 @@ function Polygon(vectors) {
     this.lineCap = "butt";
     this.fill = false;
     this.shadow = null;
+    this.visible = true;
 
     // Dummy function, only used to be drawn from a scene
     this.update = function (context) {
@@ -451,8 +450,13 @@ function Polygon(vectors) {
 
         // If false, stay silent
 
-        // Draw the line
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
 
     };
 
@@ -514,6 +518,7 @@ function Line(v1, v2) {
     this.color = RGBSet(0, 0, 0);
     this.width = 1;
     this.shadow = null;
+    this.visible = true;
 
     // Dummy function, only used to be drawn from a scene
     this.update = function (context) {
@@ -526,8 +531,13 @@ function Line(v1, v2) {
 
         // If false, stay silent
 
-        // Draw the line
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
 
     };
 
@@ -546,7 +556,7 @@ function Line(v1, v2) {
         context.closePath();
 
         // If user defined a shadow
-        if (this.shadow !== null)
+        if (this.shadow)
 
             // Then disable it, since we already drew it
             this.shadow.disable(context);
@@ -567,6 +577,7 @@ function Curve(vectors, type) {
     this.vectors = vectors;
     this.type = "quadratic";
     this.shadow = null;
+    this.visible = true;
 
     // Update the curve
     this.update = function (context) {
@@ -601,8 +612,13 @@ function Curve(vectors, type) {
 
         // If false, stay silent
 
-        // Draw the curve
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
 
     };
 
@@ -678,6 +694,7 @@ function Sprite(image) {
     this.clicked = false;
     this.activeButtons = [];
     this.shadow = null;
+    this.visible = true;
 
     // Get the mouse data as set in mousePositionX and mousePositionY
     this.getMouseData = function () {
@@ -960,9 +977,13 @@ function Sprite(image) {
 
         // If false, stay silent
 
-        // Draw the sprite
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
 
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
     };
 
     // Draw the sprite on the provided context
@@ -1205,6 +1226,7 @@ function Button(text, rect) {
     this.clicked = false;
     this.width = this.rect.width;
     this.height = this.rect.height;
+    this.visible = true;
 
     // Add a mouse event listener to the button
     this.addMouseListener = function () {
@@ -1292,8 +1314,13 @@ function Button(text, rect) {
             // Center the text
             this.text.x -= 14;
 
-        // Draw the button
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
 
     };
 
@@ -1324,6 +1351,7 @@ function Rect(width, height) {
     this.border = this.color;
     this.borderWidth = 2;
     this.shadow = null;
+    this.visible = true;
 
     // Set the rect's position to (x,y)
     this.setPosition = function (x, y) {
@@ -1347,8 +1375,13 @@ function Rect(width, height) {
             // Then enable it
             this.shadow.enable(context);
 
-        // Draw the rect
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
 
     };
 
@@ -1400,6 +1433,7 @@ function Circle(size) {
     this.border = this.color;
     this.borderWidth = 2;
     this.shadow = null;
+    this.visible = true;
 
     // Set the position of the circle
     this.setPosition = function (x, y) {
@@ -1423,8 +1457,13 @@ function Circle(size) {
             // Then enable it
             this.shadow.enable(context);
 
-        // Draw the circle
-        this.draw(context);
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
 
     };
 
