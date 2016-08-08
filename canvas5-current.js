@@ -26,7 +26,7 @@ window.onload = function (evt) {
 
 function Scene(domElement) {
 
-    this.canvas = domElement;
+    this.canvas = domElement || document.getElementById("CanvasGame");
     this.context = this.canvas.getContext("2d");
     this.width = this.canvas.width;
     this.height = this.canvas.height;
@@ -42,13 +42,25 @@ function Scene(domElement) {
     this.showInfo = false;
 
     // Pixel Manipulation
-    this.modifyColors = function (rgba, area) {
+    this.modifyColors = function (rgba, _area) {
+
+        var area = _area || null;
 
         // Make sure rgba argument is of type RGBASet
-        if (rgba.r === undefined) {
+        if (!rgba.r) {
+
             console.error("Color set must be of type RGBASet! {modifyColors(), " + rgba + "}");
             return 0;
-        }
+
+        } // If false, stay silent
+
+        // If user didn't define area
+        if (area === null)
+            
+            // Then set it to canvas size
+            area = [0, 0, this.width, this.height];
+
+        // If false, stay silent
 
         // Copy the values from the rgba param into the changeColorList array
         this.changeColorList[0] = rgba.r;
@@ -133,10 +145,24 @@ function Scene(domElement) {
     };
 
     // Define a new action (function) to be called at rendering time
-    this.newAction = function (condition, action) {
+    this.newAction = function (fn1, fn2) {
+
+        // Define local vars
+        var action = new Object();
+
+        // Add condition to action object
+        action.condition = fn1;
+        
+        // If user defined second function
+        if (fn2)
+
+            // Then add action to action object
+            action.action = fn2;
+
+        // If false, stay silent
 
         // Push the function to actionList
-        this.actionList.push({ condition: condition, action: action });
+        this.actionList.push(action);
 
     };
 
@@ -383,15 +409,19 @@ function Scene(domElement) {
         }
 
         // Loop though actions
-        for (i = 0; i < this.actionList.length; i++)
+        for (i = 0; i < this.actionList.length; i++) {
 
-            // Check if the condition portion of the action is true
-            if (this.actionList[i].condition())
+            var result = this.actionList[i].condition();
+
+            // If user defined action portion
+            if (this.actionList[i].action && result)
 
                 // If true, perform the actual action portion
                 this.actionList[i].action();
 
-        // If false, stay silent
+            // If false, stay silent
+
+        }
 
         // Loop through and update menus
         for (i = 0; i < this.menuList.length; i++)
@@ -575,7 +605,7 @@ function Line(v1, v2) {
 function Curve(vectors, type) {
 
     this.vectors = vectors;
-    this.type = "quadratic";
+    this.type = type || "quadratic";
     this.shadow = null;
     this.visible = true;
 
@@ -1684,8 +1714,8 @@ function AudioElement(src) {
 
 function MessageBox(text, x, y) {
 
-    this.x = x !== undefined ? x : 0;
-    this.y = y !== undefined ? y : 0;
+    this.x = x || 0;
+    this.y = y || 0;
     this.text = text;
     this.font = "12pt sans-serif";
     this.color = new RGBASet(100, 100, 100, 1);
