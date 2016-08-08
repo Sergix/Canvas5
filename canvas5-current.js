@@ -725,6 +725,8 @@ function Sprite(image) {
     this.activeButtons = [];
     this.shadow = null;
     this.visible = true;
+    this.rotate = 0;
+    this.scale = 0;
 
     // Get the mouse data as set in mousePositionX and mousePositionY
     this.getMouseData = function () {
@@ -1019,9 +1021,17 @@ function Sprite(image) {
     // Draw the sprite on the provided context
     this.draw = function (context) {
 
+        // Set properties for transformations
+        context.save();
+        context.rotate(this.rotate);
+        context.scale(this.scale);
+
         // Draw the image on the canvas at (x,y) at the current frame
         context.drawImage(this.spriteSheet.images[this.frame].image, this.x, this.y);
 
+        // Draw the new coord system
+        context.restore();
+        
         // If the name property is not set
         if (this.name === null)
 
@@ -1974,9 +1984,26 @@ function Shadow (offsetX, offsetY) {
 
 /*
     Helper functions:
+    - Rad2Deg
     - isColliding
     - distance
 */
+
+// Radians to (2) Degrees
+function Deg2Rad(degrees) {
+
+    // Return the new value
+    return degrees * (Math.PI / 180);
+
+}
+
+// Degrees to (2) Radians
+function Rad2Deg(radians) {
+
+    // Return the new value
+    return radians / (Math.PI / 180);
+
+}
 
 function isColliding(xy1, xy2) {
 
