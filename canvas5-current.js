@@ -276,13 +276,17 @@ function Scene(domElement) {
                     continue;
                 }
 
+                
+
+            } else {
+
                 // Set all values to true
                 this.playerSprite.moveLeft = true;
                 this.playerSprite.moveRight = true;
                 this.playerSprite.moveDown = true;
                 this.playerSprite.moveUp = true;
 
-            } // end if
+            }
 
         } // end for
 
@@ -370,13 +374,185 @@ function Scene(domElement) {
 
         } // end for
 
+        this.render();
+
+    };
+
+    // Update the scene's collision
+    this.updateAsPlatformer = function (gravity) {
+
+        // Define local vars
+        var i, j, e;
+
+        // Set the player's gravity (downward acceleration)
+        this.playerSprite.ay = gravity;
+
+        // Loop through sprites for checking against player
+        for (i = 0; i < this.sprites.length; i++) {
+
+            // Check player boundaries
+            if (this.playerSprite.boundaries !== null) {
+                if (this.playerSprite.x < 0) this.playerSprite.x = 0;
+                if (this.playerSprite.x + this.playerSprite.width > this.playerSprite.boundaries.width) this.playerSprite.x = this.playerSprite.boundaries.width - this.playerSprite.width;
+                if (this.playerSprite.y < 0) this.playerSprite.y = 0;
+                if (this.playerSprite.y + this.playerSprite.height > this.playerSprite.boundaries.height) this.playerSprite.y = this.playerSprite.boundaries.height - this.playerSprite.height;
+            }
+
+            // Set a local var to current sprite (for shorthand purposes)
+            e = this.sprites[i];
+
+            // Check if we are going to perfrom collision detection on the current sprite
+            if (!e.collide)
+
+                // If not, skip to next sprite
+                continue;
+
+
+            // Check to see if the player is colliding with the current sprite (AABB collision)
+            if (this.playerSprite.x < e.x + e.width && this.playerSprite.x + this.playerSprite.width > e.x && this.playerSprite.y < e.y + e.height && this.playerSprite.y + this.playerSprite.height > e.y) {
+
+                // Check to see which side the player is colliding on and perform a different operation for each
+
+                // Top
+                if (this.playerSprite.vy > 0) {
+                    this.playerSprite.moveDown = false;
+
+                    // Set new player y
+                    this.playerSprite.y = e.y - this.playerSprite.height;
+                    continue;
+                }
+
+                // Bottom
+                if (this.playerSprite.vy < 0) {
+                    this.playerSprite.moveUp = false;
+
+                    // Set new player y
+                    this.playerSprite.y = e.y + e.height;
+                    continue;
+                }
+
+                // Left
+                if (this.playerSprite.vx > 0) {
+                    this.playerSprite.moveLeft = false;
+                    if (!this.playerSprite.moveDown || !this.playerSprite.moveUp)
+                        continue;
+
+                    // Set new player x
+                    this.playerSprite.x = e.x - this.playerSprite.width;
+                    continue;
+                }
+
+                // Right
+                if (this.playerSprite.vx < 0) {
+                    this.playerSprite.moveRight = false;
+
+                    // Set new player x
+                    this.playerSprite.x = e.x + e.width;
+                    continue;
+                }
+
+            } else {
+
+                // Set all values to true
+                this.playerSprite.moveLeft = true;
+                this.playerSprite.moveRight = true;
+                this.playerSprite.moveDown = true;
+                this.playerSprite.moveUp = true;
+
+            }
+
+        } // end for
+
+        // Loop through sprites for checking against other sprites
+        for (i = 0; i < this.sprites.length; i++) {
+
+            // Check if we are going to perfrom collision detection on the current sprite
+            if (!this.sprites[i].collide)
+
+                // If not, skip to next sprite
+                continue;
+
+            // Check sprite boundaries
+            if (this.sprites[i].boundaries !== null) {
+                if (this.sprites[i].x < 0) this.sprites[i].x = 0;
+                if (this.sprites[i].x + this.sprites[i].width > this.sprites[i].boundaries.width) this.sprites[i].x = this.sprites[i].boundaries.width - this.sprites[i].width;
+                if (this.sprites[i].y < 0) this.sprites[i].y = 0;
+                if (this.sprites[i].y + this.sprites[i].height > this.sprites[i].boundaries.height) this.sprites[i].y = this.sprites[i].boundaries.height - this.sprites[i].height;
+            }
+
+            // Loop though sprites
+            for (j = 0; j < this.sprites.length; j++) {
+
+                // Check if we are going to perfrom collision detection on the current sprite
+                if (!e.collide)
+                    break;
+
+                // Check if the loops are on the same indice
+                if (i === j)
+
+                    // If so, skip to next sprite
+                    continue;
+
+                // Set a local var to current sprite (for shorthand purposes)
+                e = this.sprites[i];
+
+                // Check to see if the sprites are colliding (AABB collision)
+                if (this.sprites[i].x < e.x + e.width && this.sprites[i].x + this.sprites[i].width > e.x && this.sprites[i].y < e.y + e.height && this.sprites[i].y + this.sprites[i].height > e.y) {
+
+                    // Check to see which side the sprite is colliding on and perform a different operation for each
+
+                    // Left
+                    if (this.sprites[i].vx > 0) {
+                        this.sprites[i].moveLeft = false;
+
+                        // Set new sprite x
+                        this.sprites[i].x = e.x - this.sprites[i].width;
+                    } else {
+                        this.sprites[i].moveLeft = true;
+                    }
+
+                    // Right
+                    if (this.sprites[i].vx < 0) {
+                        this.sprites[i].moveRight = false;
+
+                        // Set new sprite x
+                        this.sprites[i].x = e.x + e.width;
+                    } else {
+                        this.sprites[i].moveRight = true;
+                    }
+
+                    // Top
+                    if (this.sprites[i].vy > 0) {
+                        this.sprites[i].moveDown = false;
+
+                        // Set new sprite y
+                        this.sprites[i].y = e.y - this.sprites[i].height;
+                    } else {
+                        this.sprites[i].moveDown = true;
+                    }
+
+                    // Bottom
+                    if (this.sprites[i].vy < 0) {
+                        this.sprites[i].moveUp = false;
+
+                        // Set new sprite y
+                        this.sprites[i].y = e.y + e.height;
+                    } else {
+                        this.sprites[i].moveUp = true;
+                    }
+
+                } // end if
+
+            } // end for
+
+        } // end for
+
+        this.render();
+
     };
 
     // Render the current scene and all its current and visible objects
     this.render = function () {
-
-        // Call update
-        this.update();
 
         // Render the background
         if (this.background !== null) {
@@ -705,7 +881,7 @@ function Sprite(image) {
     this.canMove = true;
     this.oldX = 0;
     this.oldY = 0;
-    this.image = image !== undefined ? image : null;
+    this.image = image || null;
     this.width = this.image === null ? 0 : this.image.image.width;
     this.height = this.image === null ? 0 : this.image.image.height;
     this.boundaries = null;
@@ -715,6 +891,7 @@ function Sprite(image) {
     this.frame = 0;
     this.changeFrame = true;
     this.activeKeys = [];
+    this.keybinds = [];
     this.moveLeft = true;
     this.moveRight = true;
     this.moveDown = true;
@@ -726,7 +903,8 @@ function Sprite(image) {
     this.shadow = null;
     this.visible = true;
     this.rotate = 0;
-    this.scale = 0;
+    this.scale = [0, 0];
+    this.onGround = false;
 
     // Get the mouse data as set in mousePositionX and mousePositionY
     this.getMouseData = function () {
@@ -812,6 +990,34 @@ function Sprite(image) {
 
     };
 
+    // Make the sprite jump using the provided velocity and gravity
+    this.jump = function (velocity, gravity, onGround) {
+
+        // Incase onGround was undefined then set it to true
+        onGround = onGround || true;
+
+        // If the player can only jump if he is on the ground
+        if (!this.onGround && onGround) 
+        
+            // Then return nothing
+            return 0;
+
+        // If false, stay silent
+
+        // Set the velocity and acceleration of the sprite
+        this.vy = -velocity;
+        this.ay = gravity;
+
+    };
+
+    // Add a new keybind that will run (fn) upon press
+    this.addKeybind = function (key, fn) {
+
+        // Push the keybind object to the keybinds array property
+        this.keybinds.push({ key: key, fn: fn });
+
+    };
+
     // Add basic keyboard controls to the sprite
     this.addBasicControls = function (movementSpeed) {
 
@@ -821,6 +1027,17 @@ function Sprite(image) {
         // Add event listeners to the provided DOM object
         window.addEventListener('keydown', bind(this, this.onKeyDown), false);
         window.addEventListener('keyup', bind(this, this.onKeyUp), false);
+
+    };
+
+    this.addPlatformerControls = function (movementSpeed) {
+
+        // Set the speed property of the sprite
+        this.speed = movementSpeed;
+
+        // Add event listeners to the provided DOM object
+        window.addEventListener('keydown', bind(this, this.onKeyDownPlatformer), false);
+        window.addEventListener('keyup', bind(this, this.onKeyUpPlatformer), false);
 
     };
 
@@ -885,6 +1102,59 @@ function Sprite(image) {
     };
 
     // Called if event listener is active
+    this.onKeyDownPlatformer = function (evt) {
+
+        // Switch for the current key code
+        switch (evt.keyCode) {
+
+            // Set the velocity to "speed" based on what key is pressed
+            case 37: /*left*/ this.vx = -this.speed; break;
+            case 65: /*A*/    this.vx = -this.speed; break;
+            case 40: /*down*/ this.vy = this.speed; break;
+            case 83: /*S*/    this.vy = this.speed; break;
+            case 39: /*right*/this.vx = this.speed; break;
+            case 68: /*D*/    this.vx = this.speed; break;
+            case 32: /*space*/this.jump(-400, 600); break;
+            default: break;
+
+        }
+
+        // Push the key code to the activeKeys array
+        this.activeKeys.push(evt.keyCode);
+
+    };
+
+    // Called if event listener is active
+    this.onKeyUpPlatformer = function (evt) {
+
+        // Switch for current key code
+        switch (evt.keyCode) {
+
+            // Set the velocity to 0 based on what key is pressed
+            case 38: /*up*/   this.vy = 0; break;
+            case 87: /*W*/    this.vy = 0; break;
+            case 37: /*left*/ this.vx = 0; break;
+            case 65: /*A*/    this.vx = 0; break;
+            case 40: /*down*/ this.vy = 0; break;
+            case 83: /*S*/    this.vy = 0; break;
+            case 39: /*right*/this.vx = 0; break;
+            case 68: /*D*/    this.vx = 0; break;
+            default: break;
+
+        }
+
+        // Get the index of the key in activeKeys
+        var index = this.activeKeys.indexOf(evt.keyCode);
+
+        // If it exists in activeKeys
+        if (index > -1)
+
+            // Then remove it from the array
+            this.activeKeys.splice(index, 1);
+
+    };
+
+    // Called if event listener is active
     this.onKeyDown = function (evt) {
 
         // Switch for the current key code
@@ -899,6 +1169,7 @@ function Sprite(image) {
             case 83: /*S*/    this.vy = this.speed; break;
             case 39: /*right*/this.vx = this.speed; break;
             case 68: /*D*/    this.vx = this.speed; break;
+            default: break;
 
         }
 
@@ -922,6 +1193,7 @@ function Sprite(image) {
             case 83: /*S*/    this.vy = 0; break;
             case 39: /*right*/this.vx = 0; break;
             case 68: /*D*/    this.vx = 0; break;
+            default: break;
 
         }
 
@@ -938,6 +1210,29 @@ function Sprite(image) {
 
     // Used to update the sprite's collision, position, and animation frame
     this.update = function (context) {
+
+        // Define local vars
+        var i;
+
+        // Loop through the keybinds array property
+        for (i = 0; i < this.keybinds.length; i++)
+
+            // If the key is pressed of the current array indice
+            if (this.isKeyPressed(this.keybinds[i].key))
+
+                // Then run the function associated with the key
+                this.keybinds[i].fn();
+
+            // If false, stay silent
+
+
+        // If the scale is 0
+        if (this.scale === [0, 0])
+
+            // Then set it to the width and height of the sprite
+            this.scale = [this.width, this.height];
+
+        // Then set it to the width and height of the sprite
 
         // Check to see if the spriteSheet property is null
         // (used on first call to update)
@@ -969,10 +1264,13 @@ function Sprite(image) {
         else
             this.moveRight = true;
 
-        if (!this.moveDown && this.vy > 0)
+        if (!this.moveDown && this.vy > 0) {
+            this.onGround = true;
             this.vy = 0;
-        else
+        } else {
+            this.onGround = false;
             this.moveDown = true;
+        }
 
         if (!this.moveUp && this.vy < 0)
             this.vy = 0;
@@ -980,10 +1278,10 @@ function Sprite(image) {
             this.moveUp = true;
 
         // Update the position and velocity
+        this.vx += this.ax / 60;
+        this.vy += this.ay / 60;
         this.x += this.vx / 60;
         this.y += this.vy / 60;
-        this.vx += this.ax / 60;
-        this.vy += this.vy / 60;
 
         // If we are going to change the animation frame
         if (this.changeFrame)
@@ -1018,19 +1316,34 @@ function Sprite(image) {
          // If false, stay silent
     };
 
+    this.transform = function (rotate, scale) {
+
+        this.rotate = rotate;
+        this.scale = scale;
+
+    };
+
     // Draw the sprite on the provided context
     this.draw = function (context) {
 
-        // Set properties for transformations
-        context.save();
-        context.rotate(this.rotate);
-        context.scale(this.scale);
+        // If we are to transform the sprite
+        if (this.rotate !== 0 || this.scale[0] !== 0 || this.scale[1] !== 0) {
 
-        // Draw the image on the canvas at (x,y) at the current frame
-        context.drawImage(this.spriteSheet.images[this.frame].image, this.x, this.y);
+            // Set properties for transformations
+            context.save();
+            context.rotate(this.rotate);
+            context.scale(this.scale[0], this.scale[1]);
 
-        // Draw the new coord system
-        context.restore();
+            // Draw the image on the canvas at (x,y) at the current frame
+            context.drawImage(this.spriteSheet.images[this.frame].image, this.x, this.y);
+
+            // Draw the new coord system
+            context.restore();
+
+        } else
+
+            // Otherwise, draw the image on the canvas at (x,y) at the current frame
+            context.drawImage(this.spriteSheet.images[this.frame].image, this.x, this.y);
         
         // If the name property is not set
         if (this.name === null)
@@ -1392,6 +1705,7 @@ function Rect(width, height) {
     this.borderWidth = 2;
     this.shadow = null;
     this.visible = true;
+    this.collide = false;
 
     // Set the rect's position to (x,y)
     this.setPosition = function (x, y) {
@@ -2029,6 +2343,95 @@ function distance(x0, y0, x1, y1) {
     // Return the square root of dx squared plus dy squared, which gets the distance
     return Math.sqrt((dx * dx) + (dy * dy));
 
+}
+
+function getKeyCode(code) {
+
+    var key;
+
+    // Check string for key value and return it
+    switch (code) {
+        case  "~" || "`":return 192;
+        case  "1"|| "!":return 49;
+        case  "2"|| "@":return  50;
+        case  "3"|| "#":return  51;
+        case  "4"|| "$":return  52;
+        case  "5"|| "%":return  53;
+        case  "6"|| "^":return  54;
+        case  "7"|| "&":return  55;
+        case  "8"|| "*":return  56;
+        case  "9"|| "(":return  57;
+        case  "0"|| ")":return  48;
+        case  "tab":return  9;
+        case  "caps lock":return  20;
+        case  "left shift":return  16;
+        case  "right shift":return  16;
+        case  "left ctrl":return  17;
+        case  "win":return  91;
+        case  "left alt":return  18;
+        case  "space":return  32;
+        case  "q"|| "Q":return  81;
+        case  "w"|| "W":return  87;
+        case  "e"|| "E":return  69;
+        case  "r"|| "R":return  82;
+        case  "t"|| "T":return  84;
+        case  "y"|| "Y":return  89;
+        case  "u"|| "U":return  85;
+        case  "i"|| "I":return  73;
+        case  "o"|| "O":return  79;
+        case  "p"|| "P":return  80;
+        case  "a"|| "A":return  65;
+        case  "s"|| "S":return  83;
+        case  "d"|| "D":return  68;
+        case  "f"|| "F":return  70;
+        case  "g"|| "G":return  71;
+        case  "h"|| "H":return  72;
+        case  "j"|| "J":return  74;
+        case  "k"|| "K":return  75;
+        case  "l"|| "L":return  76;
+        case  "z"|| "Z":return  90;
+        case  "x"|| "X":return  88;
+        case  "c"|| "C":return  67;
+        case  "v"|| "V":return  86;
+        case  "b"|| "B":return  66;
+        case  "n"|| "N":return  78;
+        case  "m"|| "M":return  77;
+        case  "<"|| ",":return  188;
+        case  ">"|| ".":return  190;
+        case  "?"|| "/":return  191;
+        case  ":"|| ";":return  186;
+        case  "esc":return  27;
+        case  "f1":return  91;
+        case  "f2":return  91;
+        case  "f3":return  91;
+        case  "f4":return  91;
+        case  "f5":return  177;
+        case  "f6":return  179;
+        case  "f7":return  179;
+        case  "f8":return  176;
+        case  "f9":return  174;
+        case  "f10":return  175;
+        case  "f11":return  173;
+        case  "f12":return  173;
+        case  "prt sc"|| "ins":return  46;
+        case  "delete":return  46;
+        case  "-"|| "_":return  189;
+        case  "+"|| "=":return  187;
+        case  "backspace":return  8;
+        case  "{"|| "[":return  219;
+        case  "}"|| "]":return  221;
+        case  "|":return  220;
+        case  '"'|| "'":return  222;
+        case  "enter":return  13;
+        case  "right alt":return  18;
+        case  "list":return  93;
+        case  "right ctrl":return  17;
+        case  "left":return  37;
+        case  "up":return  38;
+        case  "down":return  40;
+        case  "right":return  39;
+        default:return code;
+    }
 }
 
 /*
