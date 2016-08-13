@@ -239,7 +239,6 @@ function Scene(domElement) {
     this.changeColorList = [0, 0, 0, 0];
     this.colorList = [null, null, null, null];
     this.imageData = null;
-    this.playerSprite = null;
     this.background = null;
     this.backgroundColor = "white";
     this.showInfo = false;
