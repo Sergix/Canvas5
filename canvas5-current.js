@@ -438,7 +438,6 @@ function Scene(domElement) {
 
                 // Set a local var to current sprite (for shorthand purposes)
                 e = this.sprites[i];
-
                 
                 // Check if we are going to perfrom collision detection on the current sprite
                 if (!e.collide)
@@ -866,6 +865,7 @@ function Sprite(spriteSheet) {
     this.rotate = 0;
     this.scale = [0, 0];
     this.onGround = false;
+    this.keybinds = [];
 
 }
 
@@ -1030,20 +1030,19 @@ function Sprite(spriteSheet) {
         } else
 
             // Otherwise, draw the image on the canvas at (x,y) at the current frame
-            this.spriteSheet.draw(context);
+            this.spriteSheet.draw(context, new Vector(this.x, this.y));
         
         // If the name property is not set
-        if (this.name === null)
+        if (this.name !== null) {
 
-            // Then return true
-            return 1;
+            // Draw the sprite's name
+            this.name.x = this.x;
+            this.name.y = this.y - 25;
+            this.name.draw(context);
+
+        }
 
         // If false, stay silent
-
-        // Draw the sprite's name
-        this.name.x = this.x;
-        this.name.y = this.y - 25;
-        this.name.draw(context);
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -2014,11 +2013,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
     // Draw the SpriteSheet at the current frame
     SpriteSheet.prototype.draw = function (context, vector) {
 
-        var i, width = this.image.width, height = this.image.height;
-
-        if ( !(this.image.width % this.spriteWidth) || !(this.image.height % this.spriteHeight) )
-
-            return 0;
+        var i;
 
         context.drawImage(this.image.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, vector.x, vector.y, this.spriteWidth, this.spriteHeight);
 
