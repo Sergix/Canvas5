@@ -27,12 +27,18 @@ var Canvas5 = {
     onloadMessage: function (evt) {
 
         // On script load, log info to console
-        console.info("Canvas5 JavaScript Engine; version" + c5version + "; (c) 2016 Sergix");
+        console.info("Canvas5 JavaScript Engine; version " + Canvas5.version + "; (c) 2016 Sergix");
         console.warn("Using development build! May contain unknown errors!");
+
+        window.addEventListener('mousemove', Canvas5.updateMouse, false);
+        window.addEventListener('mousedown', Canvas5.mouseDown,   false);
+        window.addEventListener('mouseup',   Canvas5.mouseUp,     false);
+        window.addEventListener('keydown',   Canvas5.keyDown,     false);
+        window.addEventListener('keyup',     Canvas5.keyUp,       false);
 
     },
 
-    isKeyPressed = function (key) {
+    isKeyPressed: function (key) {
 
         // If it exists in activeKeys
         if (Canvas5.activeKeys.indexOf(key) > -1)
@@ -46,7 +52,7 @@ var Canvas5 = {
 
     },
 
-    isButtonPressed = function (button) {
+    isButtonPressed: function (button) {
 
         // If it exists in activeButtons
         if (Canvas5.activeButtons.indexOf(button) > -1)
@@ -214,13 +220,8 @@ var Canvas5 = {
 
 };
 
-
+// Call to load the Canvas5 object
 window.onload = Canvas5.onloadMessage;
-window.addEventListener('mousemove', Canvas5.updateMouse, false);
-window.addEventListener('mousedown', Canvas5.mouseDown, false);
-window.addEventListener('mouseup', Canvas5.mouseUp, false);
-window.addEventListener('keydown', Canvas5.keyDown, false);
-window.addEventListener('keyup', Canvas5.keyUp, false);
 
 /*
     Scene object constructor
@@ -428,9 +429,6 @@ function Scene(domElement) {
             // Loop though sprites
             for (j = 0; j < this.sprites.length; j++) {
 
-                // Check if we are going to perfrom collision detection on the current sprite
-                if (!e.collide)
-                    break;
 
                 // Check if the loops are on the same indice
                 if (i === j)
@@ -440,6 +438,11 @@ function Scene(domElement) {
 
                 // Set a local var to current sprite (for shorthand purposes)
                 e = this.sprites[i];
+
+                
+                // Check if we are going to perfrom collision detection on the current sprite
+                if (!e.collide)
+                    break;
 
                 // Check to see if the sprites are colliding (AABB collision)
                 if (this.sprites[i].x < e.x + e.width && this.sprites[i].x + this.sprites[i].width > e.x && this.sprites[i].y < e.y + e.height && this.sprites[i].y + this.sprites[i].height > e.y) {
@@ -838,8 +841,9 @@ function Curve(vectors, type) {
     desc: Defines an object that can be used to draw an image on the screen with other various modifiable properties
 */
 
-function Sprite(image) {
+function Sprite(spriteSheet) {
 
+    this.spriteSheet = spriteSheet || new SpriteSheet(null, 0, 0);
     this.x = 0;
     this.y = 0;
     this.speed = 0;
@@ -847,13 +851,11 @@ function Sprite(image) {
     this.vy = 0;
     this.ax = 0;
     this.ay = 0;
-    this.image = image || null;
-    this.width = this.image === null ? 0 : this.image.image.width;
-    this.height = this.image === null ? 0 : this.image.image.height;
+    this.width = this.spriteSheet.spriteWidth;
+    this.height = this.spriteSheet.spriteHeight;
     this.boundaries = null;
     this.collide = true;
     this.name = null;
-    this.spriteSheet = null;
     this.moveLeft = true;
     this.moveRight = true;
     this.moveDown = true;
@@ -942,15 +944,6 @@ function Sprite(image) {
             // Then set it to the width and height of the sprite
             this.scale = [this.width, this.height];
 
-        // Then set it to the width and height of the sprite
-
-        // Check to see if the spriteSheet property is null
-        // (used on first call to update)
-        if (this.spriteSheet === null)
-
-            // If true, create a sprite sheet object containing the image property (for drawing)
-            this.spriteSheet = new SpriteSheet([this.image]);
-
         // If false, stay silent
 
         // Check to see if the width and height have been set yet
@@ -1029,7 +1022,7 @@ function Sprite(image) {
             context.scale(this.scale[0], this.scale[1]);
 
             // Draw the image on the canvas at (x,y) at the current frame
-            context.drawImage(this.spriteSheet.images[this.frame].image, this.x, this.y);
+            this.spriteSheet.draw(context, new Vector(this.x, this.y));
 
             // Draw the new coord system
             context.restore();
@@ -1037,7 +1030,7 @@ function Sprite(image) {
         } else
 
             // Otherwise, draw the image on the canvas at (x,y) at the current frame
-            context.drawImage(this.spriteSheet.images[this.frame].image, this.x, this.y);
+            this.spriteSheet.draw(context);
         
         // If the name property is not set
         if (this.name === null)
@@ -1062,21 +1055,8 @@ function Sprite(image) {
 
     };
 
-
-/*
-    Player object constructor (inherits Sprite)
-    desc: Creates a sprite that has properties specific to the player
-*/
-
-function Player (image) {
-
-    this.image = image;
-    this.keybinds = [];
-
-}
-
     // Add a new keybind that will run (fn) upon press
-    Player.prototype.addKeybind = function (key, fn) {
+    Sprite.prototype.addKeybind = function (key, fn) {
 
         // Push the keybind object to the keybinds array property
         this.keybinds.push({ key: key, fn: fn });
@@ -1084,7 +1064,7 @@ function Player (image) {
     };
 
     // Add basic keyboard controls to the sprite
-    Player.prototype.addBasicControls = function (movementSpeed) {
+    Sprite.prototype.addBasicControls = function (movementSpeed) {
 
         // Set the speed property of the sprite
         this.speed = movementSpeed;
@@ -1095,7 +1075,7 @@ function Player (image) {
 
     };
 
-    Player.prototype.addPlatformerControls = function (movementSpeed) {
+    Sprite.prototype.addPlatformerControls = function (movementSpeed) {
 
         // Set the speed property of the sprite
         this.speed = movementSpeed;
@@ -1107,7 +1087,7 @@ function Player (image) {
     };
 
     // Add an event listener for the mouse to the sprite
-    Player.prototype.addMouseListener = function () {
+    Sprite.prototype.addMouseListener = function () {
 
         // Add event listeners to the provided DOM object
         window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
@@ -1115,13 +1095,13 @@ function Player (image) {
     };
 
     // Called if event listener is active
-    Player.prototype.onMouseDown = function (evt) {
+    Sprite.prototype.onMouseDown = function (evt) {
 
         // Switch for button code
         switch (evt.button) {
 
             // Set various values based on mouse input
-            case 0: /*left*/
+            case 0: // left
 
                 // If the mouse is pressed on top of the sprite
                 if (Canvas5.mouseX >= this.x && Canvas5.mouseX <= this.x + this.width && Canvas5.mouseY >= this.y && Canvas5.mouseY <= this.y + this.width)
@@ -1137,7 +1117,7 @@ function Player (image) {
     };
 
     // Called if event listener is active
-    Player.prototype.onMouseUp = function (evt) {
+    Sprite.prototype.onMouseUp = function (evt) {
 
         // Set the clicked property to false
         this.clicked = false;
@@ -1145,19 +1125,19 @@ function Player (image) {
     };
 
     // Called if event listener is active
-    Player.prototype.onKeyDownPlatformer = function (evt) {
+    Sprite.prototype.onKeyDownPlatformer = function (evt) {
 
         // Switch for the current key code
         switch (evt.keyCode) {
 
             // Set the velocity to "speed" based on what key is pressed
-            case 37: /*left*/ this.vx = -this.speed; break;
-            case 65: /*A*/    this.vx = -this.speed; break;
-            case 40: /*down*/ this.vy = this.speed; break;
-            case 83: /*S*/    this.vy = this.speed; break;
-            case 39: /*right*/this.vx = this.speed; break;
-            case 68: /*D*/    this.vx = this.speed; break;
-            case 32: /*space*/this.jump(-400, 600); break;
+            case 37: this.vx = -this.speed; break;
+            case 65: this.vx = -this.speed; break;
+            case 40: this.vy = this.speed; break;
+            case 83: this.vy = this.speed; break;
+            case 39: this.vx = this.speed; break;
+            case 68: this.vx = this.speed; break;
+            case 32: this.jump(-400, 600); break;
             default: break;
 
         }
@@ -1165,20 +1145,20 @@ function Player (image) {
     };
 
     // Called if event listener is active
-    Player.prototype.onKeyUpPlatformer = function (evt) {
+    Sprite.prototype.onKeyUpPlatformer = function (evt) {
 
         // Switch for current key code
         switch (evt.keyCode) {
 
             // Set the velocity to 0 based on what key is pressed
-            case 38: /*up*/   this.vy = 0; break;
-            case 87: /*W*/    this.vy = 0; break;
-            case 37: /*left*/ this.vx = 0; break;
-            case 65: /*A*/    this.vx = 0; break;
-            case 40: /*down*/ this.vy = 0; break;
-            case 83: /*S*/    this.vy = 0; break;
-            case 39: /*right*/this.vx = 0; break;
-            case 68: /*D*/    this.vx = 0; break;
+            case 38: this.vy = 0; break;
+            case 87: this.vy = 0; break;
+            case 37: this.vx = 0; break;
+            case 65: this.vx = 0; break;
+            case 40: this.vy = 0; break;
+            case 83: this.vy = 0; break;
+            case 39: this.vx = 0; break;
+            case 68: this.vx = 0; break;
             default: break;
 
         }
@@ -1200,20 +1180,20 @@ function Player (image) {
     };
 
     // Called if event listener is active
-    Player.prototype.onKeyDown = function (evt) {
+    Sprite.prototype.onKeyDown = function (evt) {
 
         // Switch for the current key code
         switch (evt.keyCode) {
 
             // Set the velocity to "speed" based on what key is pressed
-            case 38: /*up*/   this.vy = -this.speed; break;
-            case 87: /*W*/    this.vy = -this.speed; break;
-            case 37: /*left*/ this.vx = -this.speed; break;
-            case 65: /*A*/    this.vx = -this.speed; break;
-            case 40: /*down*/ this.vy = this.speed; break;
-            case 83: /*S*/    this.vy = this.speed; break;
-            case 39: /*right*/this.vx = this.speed; break;
-            case 68: /*D*/    this.vx = this.speed; break;
+            case 38: this.vy = -this.speed; break;
+            case 87: this.vy = -this.speed; break;
+            case 37: this.vx = -this.speed; break;
+            case 65: this.vx = -this.speed; break;
+            case 40: this.vy = this.speed; break;
+            case 83: this.vy = this.speed; break;
+            case 39: this.vx = this.speed; break;
+            case 68: this.vx = this.speed; break;
             default: break;
 
         }
@@ -1236,28 +1216,25 @@ function Player (image) {
     };
 
     // Called if event listener is active
-    Player.prototype.onKeyUp = function (evt) {
+    Sprite.prototype.onKeyUp = function (evt) {
 
         // Switch for current key code
         switch (evt.keyCode) {
 
             // Set the velocity to 0 based on what key is pressed
-            case 38: /*up*/   this.vy = 0; break;
-            case 87: /*W*/    this.vy = 0; break;
-            case 37: /*left*/ this.vx = 0; break;
-            case 65: /*A*/    this.vx = 0; break;
-            case 40: /*down*/ this.vy = 0; break;
-            case 83: /*S*/    this.vy = 0; break;
-            case 39: /*right*/this.vx = 0; break;
-            case 68: /*D*/    this.vx = 0; break;
+            case 38:   this.vy = 0; break; // up
+            case 87:   this.vy = 0; break; // W
+            case 37:   this.vx = 0; break; // Left
+            case 65:   this.vx = 0; break; // A
+            case 40:   this.vy = 0; break; // down
+            case 83:   this.vy = 0; break; // S
+            case 39:   this.vx = 0; break; // right
+            case 68:   this.vx = 0; break; // D
             default: break;
 
         }
 
     };
-
-    // Inherit the Sprite object for construct
-    Player.prototype = new Sprite();
 
 /*
     GameMenu object constructor
@@ -1280,7 +1257,7 @@ function GameMenu() {
 
 }
 
-// Add a new element to the menu
+    // Add a new element to the menu
     GameMenu.prototype.add = function (element) {
 
         // Push the provided element to the elements array
@@ -1369,10 +1346,10 @@ function GameMenu() {
     GameMenu.prototype.update = function (context) {
 
         // If edit mode is enabled
-        if (this.editMode !== false)
+        if (this.editMode)
 
             // Add a mouse listener to the menu using "editMode" DOM object
-            this.addMouseListener(this.editMode);
+            this.addMouseListener();
 
         // If false, stay silent
 
@@ -1732,19 +1709,14 @@ function Client(url) {
     this.server = new WebSocket(url);
     this.currentData = null;
 
-    // Called automatically to connect to the server
-    (function (obj) {
+    // Warn the user of possible errors
+    console.warn("Canvas5 WebSocket implementation is currently very limited and buggy!");
 
-        // Warn the user of possible errors
-        console.warn("Canvas5 WebSocket implementation is currently very limited and buggy!");
-
-        // Set the event handlers
-        obj.server.onopen    = obj.event;
-        obj.server.onclose   = obj.event;
-        obj.server.onmessage = obj.event;
-        obj.server.onerror   = obj.event;
-
-    })(this);
+    // Set the event handlers
+    this.server.onopen    = this.event;
+    this.server.onclose   = this.event;
+    this.server.onmessage = this.event;
+    this.server.onerror   = this.event;
 
 }
 
@@ -1848,13 +1820,9 @@ function AudioElement(src) {
     this.domElement = document.createElement('audio');
     this.src = src;
 
-    // Called automatically on new instance
-    (function (obj) {
+    // Set the source of the audio to the filepath provided
+    this.domElement.setAttribute('src', this.src);
 
-        // Set the source of the audio to the filepath provided
-        obj.domElement.setAttribute('src', this.src);
-
-    })(this);
 
 }
 
@@ -2023,13 +1991,8 @@ function GameImage(src) {
     this.image = new Image();
     this.src = src;
 
-    // Called automatically upon new instance
-    (function (obj) {
-
-        // Set the source of the image property
-        obj.image.src = obj.src;
-
-    })(this);
+    // Set the source of the image property
+    this.image.src = this.src;
 
 }
 
@@ -2057,7 +2020,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
 
             return 0;
 
-        context.drawImage(this.image, this.frame * this.spriteWidth, this.frame * this.spriteHeight, this.spriteWidth, this.spriteHeight, vector.x, vector.y, this.spriteWidth, this.spriteHeight);
+        context.drawImage(this.image.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, vector.x, vector.y, this.spriteWidth, this.spriteHeight);
 
         // If we are going to change the animation frame
         if (this.changeFrame)
@@ -2068,7 +2031,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
         // If false, stay silent
 
         // If we have reached the end of the frame list
-        if (this.frame === this.spriteSheet.images.length)
+        if (this.frame === this.image.image.width / this.spriteWidth)
 
             // Then return to the first frame
             this.frame = 0;
