@@ -429,15 +429,14 @@ function Scene(domElement) {
             // Loop though sprites
             for (j = 0; j < this.sprites.length; j++) {
 
-
                 // Check if the loops are on the same indice
-                if (i === j)
+                if (this.sprites[i] === this.sprites[j] || i === j)
 
                     // If so, skip to next sprite
                     continue;
 
                 // Set a local var to current sprite (for shorthand purposes)
-                e = this.sprites[i];
+                e = this.sprites[j];
                 
                 // Check if we are going to perfrom collision detection on the current sprite
                 if (!e.collide)
@@ -2013,7 +2012,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
     // Draw the SpriteSheet at the current frame
     SpriteSheet.prototype.draw = function (context, vector) {
 
-        var i;
+        var i; 
 
         context.drawImage(this.image.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, vector.x, vector.y, this.spriteWidth, this.spriteHeight);
 
@@ -2026,7 +2025,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
         // If false, stay silent
 
         // If we have reached the end of the frame list
-        if (this.frame === this.image.image.width / this.spriteWidth)
+        if (this.frame >= this.image.image.width / this.spriteWidth)
 
             // Then return to the first frame
             this.frame = 0;
