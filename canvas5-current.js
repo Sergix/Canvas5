@@ -872,7 +872,7 @@ function Sprite(spriteSheet) {
     Sprite.prototype.near = function (sprite, units) {
 
         // If true
-        if (distance(this.x, this.y, sprite.x, sprite.y) <= units)
+        if (Canvas5.distance(this.x, this.y, sprite.x, sprite.y) <= units)
 
             // Return true
             return 1;
@@ -1999,23 +1999,20 @@ function GameImage(src) {
     desc: A collection of images used for animation
 */
 
-function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
+function SpriteSheet(spriteSheet, spriteWidth, spriteHeight, frameSpeed) {
 
     this.image = spriteSheet;
     this.spriteWidth = spriteWidth;
     this.spriteHeight = spriteHeight;
     this.frame = 0;
     this.changeFrame = true;
+    this.frameChangeSpeed = frameSpeed || 100;
 
 }
 
     // Draw the SpriteSheet at the current frame
     SpriteSheet.prototype.draw = function (context, vector) {
-
-        var i; 
-
-        context.drawImage(this.image.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, vector.x, vector.y, this.spriteWidth, this.spriteHeight);
-
+        
         // If we are going to change the animation frame
         if (this.changeFrame)
 
@@ -2025,12 +2022,14 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
         // If false, stay silent
 
         // If we have reached the end of the frame list
-        if (this.frame >= this.image.image.width / this.spriteWidth)
+        if (this.frame >= this.image.image.width /  this.spriteWidth)
 
             // Then return to the first frame
             this.frame = 0;
 
         // If false, stay silent
+
+        context.drawImage(this.image.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, vector.x, vector.y, this.spriteWidth, this.spriteHeight);
 
     };
 
