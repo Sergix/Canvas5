@@ -30,7 +30,6 @@ var Canvas5 = {
 
         // On script load, log info to console
         console.info("Canvas5 JavaScript Engine; version " + Canvas5.version + "; (c) 2016 Sergix");
-        console.warn("Using development build! May contain unknown errors!");
 
         window.addEventListener('mousemove', Canvas5.updateMouse, false);
         window.addEventListener('mousedown', Canvas5.mouseDown,   false);
