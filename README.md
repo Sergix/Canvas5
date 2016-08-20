@@ -22,6 +22,6 @@
   If you have any questions or suggestions, please either open a Pull Request or contact me at [sergix@outlook.com](mailto:sergix@outlook.com). Thank you!
   
   
-> Canvas5 v1.3-development  
-> canvas5-dev1.3.js  
+> Canvas5 v1.3-release
+> canvas5-release1.3.js  
 > (c) 2016 Sergix  
