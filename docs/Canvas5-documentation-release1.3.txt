@@ -25,7 +25,8 @@ Contents
    e. Primitive Shape objects
       1. Circle object
       2. Rectangle object
-7. Credits
+  7. Canvas5 object
+  8. Credits
 
 
 Section 1. About
@@ -245,15 +246,15 @@ Section 5. Drawing the scene
 create the following function and call using requestAnimationFrame it at the end of your code:
 
     function renderFunction() {
-        sceneName.render(fps);
+        sceneName.render();
         requestAnimationFrame(renderFunction);
     }
     requestAnimationFrame(renderFunction);
 
-where renderFunction is the function name of your choice, sceneName is the variable name of the scene, and fps is the frames per
-second to be drawn at. What this does is call the function renderFunction, and then render the scene. The line
-"requestAnimationFrame(renderFunction);" requests the browser for a new frame to be drawn, and then calls the function with the
-drawing code, in which case is renderFunction, and the drawing code is "sceneName.render(fps);"
+where renderFunction is the function name of your choice, and sceneName is the variable name of the scene. What this does is call 
+the function renderFunction, and then render the scene. The line "requestAnimationFrame(renderFunction);" requests the browser 
+for a new frame to be drawn, and then calls the function with the drawing code, in which case is renderFunction, and the drawing 
+code is "sceneName.render(fps);"
 
 
 Section 6. Miscellaneous Features
@@ -399,7 +400,31 @@ can set the width of the border by changing the borderWidth property. The Circle
 update(context, fps) and draw(context), which are self-explanatory in function.
 
 
-Section 7. Credits
+Section 7. Canvas5 object
+
+    The Canvas5 object is used for helper functions, window onload functions, and other properties used by the script.
+The following is a list of these properties and functions:
+
+    version         : defines the version of the Canvas5 script being used.
+    mouseX          : the mouse's current X position.
+    mouseY          : the mouse's current Y position.
+    activeKeys      : the list of keys that are being pressed.
+    activeButtons   : list of buttons that are being pressed.
+    deg             : used for conversion of radian values to degrees.
+    currentScene    : defines a scene object that is the current primary one.
+    onloadMessage   : called on window load to log information to the console and set event handlers.
+    isKeyPressed    : returns true if the requested key code is active.
+    isButtonPressed : returns true if the requested button code is active.
+    updateMouse     : updates the mouseX and mouseY properties.
+    mouseDown       : called when a mouse button is pressed.
+    mouseUp         : called when a mouse button is released.
+    keyDown         : called when a key is pressed.
+    keyUp           : called when a key is lifted.
+    distance        : returns the distance between two objects (in pixels).
+    getKeyCode      : returns the key code of the requested key (used in calling "isKeyPressed" function)
+
+
+Section 8. Credits
 
     This code was created by me, except for the bind() function, with which the respective authors are in the
 engine's code. You may use and modify the engines code as you please, but you must give credit for modifying the
