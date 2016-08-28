@@ -3,7 +3,7 @@
 */
 
 /*
-* Game Engine release1.3 Original Full Script
+* Game Engine dev1.4 Original Full Script
 * (c) 2016 Sergix
 */
 
@@ -14,7 +14,7 @@
 
 var Canvas5 = {
 
-    version: "release1.3",
+    version: "dev1.4",
 
     mouseX: 0,
     mouseY: 0,
@@ -243,7 +243,6 @@ function Scene(domElement) {
     this.colorList = [null, null, null, null];
     this.imageData = null;
     this.background = null;
-    this.backgroundColor = "white";
     this.showInfo = false;
 
 }
@@ -530,18 +529,9 @@ function Scene(domElement) {
     Scene.prototype.render = function () {
 
         // Render the background
-        if (this.background !== null) {
-
-            // Draw the image specified in background
-            this.context.drawImage(this.background.image, 0, 0, this.width, this.height);
-
-        } else {
-
-            // Draw the color specified in backgroundColor
-            this.context.fillStyle = this.backgroundColor;
+        var set = this.background.draw(new Vector(0, 0));
+        if (set)
             this.context.fillRect(0, 0, this.width, this.height);
-
-        }
 
         // Loop through sprites and update each
         for (i = 0; i < this.sprites.length; i++)
@@ -1249,7 +1239,6 @@ function GameMenu() {
     this.alwaysActive = false;
     this.collide = false;
     this.background = null;
-    this.backgroundColor = new RGBSet(255, 255, 255);
     this.width = 200;
     this.height = 200;
     this.editMode = false;
@@ -1386,25 +1375,9 @@ function GameMenu() {
     // Draw the menu
     GameMenu.prototype.draw = function (context) {
 
-        // If the background is an RGBASet
-        if (this.backgroundColor.r !== undefined)
-
-            // Then set the fillStyle to a color string ("rgba(r, g, b, a)")
-            context.fillStyle = this.backgroundColor.getAsString();
-
-        else
-
-            // Otherwise, set the fillStyle to whatever background color is
-            context.fillStyle = this.backgroundColor;
-
-        // If the bacground is an image
-        if (this.background !== null)
-
-            // Then draw the image
-            context.drawImage(this.background.image, this.x, this.y, this.width, this.height);
-        else
-
-            // Otherwise, fill the scene with the set color
+        var set = this.background.draw(new Vector(this.x, this.y));
+        
+        if (set)
             context.fillRect(this.x, this.y, this.width, this.height);
 
         // Loop through the menu's elements
@@ -2002,6 +1975,15 @@ function GameImage(src) {
 
 }
 
+    GameImage.prototype.draw = function (vector, context) {
+
+        context = context || Canvas5.currentScene.context;
+        context.drawImage(this.image, vector.x, vector.y);
+
+        return 0;
+
+    }
+
 /*
     SpriteSheet object constructor
     desc: A collection of images used for animation
@@ -2062,6 +2044,15 @@ function RGBSet(r, g, b) {
 
     };
 
+    RGBSet.prototype.draw = function (context) {
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = this.getAsString();
+
+        return 1;
+
+    }
+
 /*
     RGBASet object constructor
     desc: Creates a new Red-Green-Blue-Alpha color value
@@ -2083,6 +2074,15 @@ function RGBASet(r, g, b, a) {
         return "rgba(" + this.r + "," + this.g + "," + this.b + "," + this.a + ")";
 
     };
+
+    RGBASet.prototype.draw = function (context) {
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = this.getAsString();
+
+        return 1;
+
+    }
 
 /*
    HSLSet object constructor
@@ -2106,6 +2106,15 @@ function HSLSet(h, s, l) {
 
     };
 
+    HSLSet.prototype.draw = function (context) {
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = this.getAsString();
+
+        return 1;
+
+    }
+
 /*
     HSLASet object constructor
     desc: Creates a new Hue-Saturation-Lightness-Alpha color value
@@ -2128,6 +2137,70 @@ function HSLASet(h, s, l, a) {
         return "hsla(" + this.r + "," + this.g + "," + this.b + "," + (this.a > 1 ? 1 : this.a) + ")";
 
     };
+
+    HSLASet.prototype.draw = function (context) {
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = this.getAsString();
+
+        return 1;
+
+    }
+
+function ColorStop(position, color) {
+
+    this.position = position;
+    this.color = color;
+
+}
+
+function LinearGradient(line, colorStops, context) {
+
+    this.gradient = Canvas5.currentScene !== null ? Canvas5.currentScene.context.createLinearGradient(line.vectors[0].x, line.vectors[0].y, line.vectors[1].x, line.vectors[1].y) : context.createLinearGradient(line.vectors[0].x, line.vectors[0].y, line.vectors[1].x, line.vectors[1].y)
+    this.colorStops = colorStops;
+
+    var i;
+
+    for (i = 0; i < this.colorStops.length; i++) {
+
+        this.gradient.addColorStop(this.colorStop.position, this.colorStop.color.getAsString());
+
+    }
+
+}
+
+    LinearGradient.prototype.draw = function (context) {
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = this.gradient;
+
+        return 1;
+
+    }
+
+function RadialGradient(position, radius, end, endRadius, colorStops, context) {
+
+    this.gradient = Canvas5.currentScene !== null ? Canvas5.currentScene.context.createRadialGradient(position.x, position.y, radius, end.x, end.y, endRadius) : context.createRadialGradient(line.vectors[0].x, line.vectors[0].y, line.vectors[1].x, line.vectors[1].y)
+    this.colorStops = colorStops;
+
+    var i;
+
+    for (i = 0; i < this.colorStops.length; i++) {
+
+        this.gradient.addColorStop(this.colorStop.position, this.colorStop.color.getAsString());
+
+    }
+
+}
+
+    LinearGradient.prototype.draw = function (context) {
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = this.gradient;
+
+        return 1;
+
+    }
 
 /*
     Shadow object constructor
