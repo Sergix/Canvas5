@@ -26,6 +26,20 @@ var Canvas5 = {
 
     currentScene: null,
 
+    render: function () {
+
+        Canvas5.currentScene.update();
+        requestAnimationFrame(Canvas5.render);
+
+    },
+
+    renderAsPlatformer: function () {
+
+        Canvas5.currentScene.updateAsPlatformer();
+        requestAnimationFrame(Canvas5.renderAsPlatformer);
+
+    },
+
     onloadMessage: function (evt) {
 
         // On script load, log info to console
@@ -634,10 +648,10 @@ function Polygon(vectors) {
     Polygon.prototype.draw = function (context) {
 
         // Define local vars
-        var i;
+        var i, context = context || Canvas5.currentScene.context;
 
         // Set drawing parameters
-        context.fillStyle = this.color.getAsString();
+        this.color.draw(context);
         context.strokeStyle = this.color.getAsString();
         context.lineWidth = this.width;
         context.lineCap = this.lineJoin;
@@ -1571,17 +1585,19 @@ function Rect(width, height) {
     // Draw the rect using the provided context and color
     Rect.prototype.draw = function (context, color) {
 
+        context = context || Canvas5.currentScene.context;
+
         // If the user provided a color
         if (color !== undefined) {
 
             // Then set the fillStyle and strokeStyle to it
-            context.fillStyle = color.getAsString();
+            this.color.draw(context);
             context.strokeStyle = this.border.getAsString();
 
         } else {
 
             // Otherwise, set the fillStyle and strokeStyle to the set color property
-            context.fillStyle = this.color.getAsString();
+            this.color.draw(context);
             context.strokeStyle = this.border.getAsString();
 
         }
@@ -1654,8 +1670,10 @@ function Circle(size) {
     // Draw the circle
     Circle.prototype.draw = function (context) {
 
+        context = context || Canvas5.currentScene.context;
+
         // Set the color, border, border width
-        context.fillStyle = this.color;
+        this.color.draw(context);
         context.strokeStyle = this.border;
         context.lineWidth = this.borderWidth;
 
@@ -1907,8 +1925,10 @@ function MessageBox(text, x, y) {
     // Draw the text using the provided context
     MessageBox.prototype.draw = function (context) {
 
+        context = context || Canvas5.currentScene.context;
+
         // Set the color of the text using the color property
-        context.fillStyle = this.color.getAsString();
+        this.color.draw(context);
 
         // Set the font of the text using the font property
         context.font = this.font;
