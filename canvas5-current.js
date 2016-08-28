@@ -254,7 +254,7 @@ function Scene(domElement) {
     this.actionList = [];
     this.menuList = [];
     this.changeColorList = [0, 0, 0, 0];
-    this.colorList = [null, null, null, null];
+    this.colorList = [];
     this.imageData = null;
     this.background = null;
     this.showInfo = false;
@@ -281,6 +281,8 @@ function Scene(domElement) {
             area = [0, 0, this.width, this.height];
 
         // If false, stay silent
+
+        this.colorList = [];
 
         // Copy the values from the rgba param into the changeColorList array
         this.changeColorList[0] = rgba.r;
@@ -337,11 +339,7 @@ function Scene(domElement) {
                 if (a < 0)
                     a = 0;
 
-                // Change color list to current RGBA values
-                this.colorList[0] = r;
-                this.colorList[1] = g;
-                this.colorList[2] = b;
-                this.colorList[3] = a;
+                this.colorList.push([r, g, b, a]);
 
                 // Put new RGBA values into imageData array
                 this.imageData.data[index] = r;
@@ -1141,7 +1139,7 @@ function Sprite(spriteSheet) {
             case 83: this.vy = this.speed; break;
             case 39: this.vx = this.speed; break;
             case 68: this.vx = this.speed; break;
-            case 32: this.jump(-400, 600); break;
+            case 32: this.jump(4, 6); break;
             default: break;
 
         }
