@@ -1139,7 +1139,7 @@ function Sprite(spriteSheet) {
             case 83: this.vy = this.speed; break;
             case 39: this.vx = this.speed; break;
             case 68: this.vx = this.speed; break;
-            case 32: this.jump(4, 6); break;
+            case 32: this.jump(this.speed, this.speed * 1.4); break;
             default: break;
 
         }
@@ -1530,10 +1530,9 @@ function Button(text, rect) {
     desc: A rectangle that can be drawn at any width and height
 */
 
-function Rect(width, height) {
+function Rect(vector, width, height) {
 
-    this.x = 0;
-    this.y = 0;
+    this.position = vector;
     this.vx = 0;
     this.vy = 0;
     this.width = width;
@@ -1552,8 +1551,8 @@ function Rect(width, height) {
     Rect.prototype.setPosition = function (x, y) {
 
         // Set the (x,y) properties
-        this.x = x;
-        this.y = y;
+        this.vector.x = x;
+        this.vector.y = y;
 
     };
 
@@ -1561,8 +1560,8 @@ function Rect(width, height) {
     Rect.prototype.update = function (context) {
 
         // Update the (x,y) using the set velocity
-        this.x += this.vx;
-        this.y += this.vy;
+        this.vector.x += this.vx;
+        this.vector.y += this.vy;
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -1601,8 +1600,8 @@ function Rect(width, height) {
         }
 
         // Draw the rect
-        context.fillRect(this.x, this.y, this.width, this.height);
-        context.strokeRect(this.x, this.y, this.width, this.height);
+        context.fillRect(this.vector.x, this.vector.y, this.width, this.height);
+        context.strokeRect(this.vector.x, this.vector.y, this.width, this.height);
 
         // If user defined a shadow
         if (this.shadow !== null)
