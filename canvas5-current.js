@@ -748,35 +748,25 @@ function Line(v1, v2) {
     };
 
 /*
-    Curve object constructor
-    desc: Draws either a quadratic or bezier curve
+    BezierCurve object constructor
+    desc: Draws a bezier (2-contol point) curve
 */
 
-function Curve(vectors, type) {
+function BezierCurve(vectors) {
 
     this.vectors = vectors;
-    this.type = type || "quadratic";
     this.shadow = null;
     this.visible = true;
 
 }
 
     // Update the curve
-    Curve.prototype.update = function (context) {
+    BezierCurve.prototype.update = function (context) {
 
-        // If type is not valid
-        if (this.type !== "quadratic" && this.type !== "bezier") {
-
-            // Log error
-            console.error("Type attribute must be either \"quadratic\" or \"bezier\"! {Curve.update(), " + this.type + "}");
-
-            // Then exit function
-            return 0;
-
-        } // If false, stay silent
+        context = context || Canvas5.currentScene.context;
 
         // If length is not valid
-        if ((this.vectors.length !== 3 && this.type === "quadratic") || (this.vectors.length !== 4 && this.type === "bezier")) {
+        if (this.vectors.length !== 4) {
 
             // Log error
             console.error("Vectors array is not correct length to draw curve! {Curve.update(), " + this.vectors + "}");
@@ -805,7 +795,79 @@ function Curve(vectors, type) {
     };
 
     // Draw the curve
-    Curve.prototype.draw = function (context) {
+    BezierCurve.prototype.draw = function (context) {
+
+        // Define local vars
+        var i;
+
+        // Start path
+        context.beginPath();
+        context.moveTo(this.vectors[0].x, this.vectors[0].y);
+
+        // Draw a bezier curve
+        context.bezierCurveTo(this.vectors[1].x, this.vectors[1].y, this.vectors[2].x, this.vectors[2].y, this.vectors[3].x, this.vectors[3].y);
+
+        // Stroke and end the path
+        context.stroke();
+        context.closePath();
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then disable it, since we already drew it
+            this.shadow.disable(context);
+
+        // If false, stay silent
+
+    };
+
+/*
+    QuadraticCurve object constructor
+    desc: Draws a quadratic (1-contol point) curve
+*/
+
+function QuadraticCurve(vectors) {
+
+    this.vectors = vectors;
+    this.shadow = null;
+    this.visible = true;
+
+}
+
+    // Update the curve
+    QuadraticCurve.prototype.update = function (context) {
+
+        // If length is not valid
+        if (this.vectors.length !== 3) {
+
+            // Log error
+            console.error("Vectors array is not correct length to draw curve! {Curve.update(), " + this.vectors + "}");
+
+            // Then exit function
+            return 0;
+
+        } // If false, stay silent
+
+        // If user defined a shadow
+        if (this.shadow !== null)
+
+            // Then enable it
+            this.shadow.enable(context);
+
+        // If false, stay silent
+
+        // If the object is visible
+        if (this.visible)
+
+            // Then draw it
+            this.draw(context);
+
+         // If false, stay silent
+
+    };
+
+    // Draw the curve
+    QuadraticCurve.prototype.draw = function (context) {
 
         // Define local vars
         var i;
@@ -814,15 +876,8 @@ function Curve(vectors, type) {
         context.beginPath();
         context.moveTo(this.vectors[0].x, this.vectors[0].y);
 
-        // If curve type is quadratic
-        if (this.type === "quadratic")
-
-            // Then draw the curve
-            context.quadraticCurveTo(this.vectors[1].x, this.vectors[1].y, this.vectors[2].x, this.vectors[2].y);
-        else
-
-            // Otherwise, draw a bezier curve
-            context.bezierCurveTo(this.vectors[1].x, this.vectors[1].y, this.vectors[2].x, this.vectors[2].y, this.vectors[3].x, this.vectors[3].y);
+        // Draw a bezier curve
+        context.QuadraticCurveTo(this.vectors[1].x, this.vectors[1].y, this.vectors[2].x, this.vectors[2].y);
 
         // Stroke and end the path
         context.stroke();
@@ -1616,14 +1671,13 @@ function Rect(vector, width, height) {
     desc: A simple circle that can be drawn using any radius
 */
 
-function Circle(size) {
+function Circle(vector, size) {
 
-    this.x = 0;
-    this.y = 0;
+    this.vector = vector;
     this.vx = 0;
     this.vy = 0;
     this.radius = size;
-    this.color = "white";
+    this.color = new RGBSet(255, 255, 255);
     this.border = this.color;
     this.borderWidth = 2;
     this.shadow = null;
@@ -1633,11 +1687,11 @@ function Circle(size) {
 
 
     // Set the position of the circle
-    Circle.prototype.setPosition = function (x, y) {
+    Circle.prototype.setPosition = function (vector) {
 
         // Set the (x,y) property to (x,y)
-        this.x = x;
-        this.y = y;
+        this.vector.x = vector.x;
+        this.vector.y = vector.y;
 
     };
 
@@ -1645,8 +1699,8 @@ function Circle(size) {
     Circle.prototype.update = function (context) {
 
         // Update the (x,y) property using the set velocity
-        this.x += this.vx;
-        this.y += this.vy;
+        this.vector.x += this.vx;
+        this.vector.y += this.vy;
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -1671,12 +1725,12 @@ function Circle(size) {
 
         // Set the color, border, border width
         this.color.draw(context);
-        context.strokeStyle = this.border;
+        context.strokeStyle = this.border.getAsString();
         context.lineWidth = this.borderWidth;
 
         // Draw the circle
         context.beginPath();
-        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, true);
+        context.arc(this.vector.x, this.vector.y, this.radius, 0, Math.PI * 2, true);
         context.closePath();
         context.fill();
         context.stroke();
