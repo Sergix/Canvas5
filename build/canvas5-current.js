@@ -2216,7 +2216,27 @@ function HSLASet(h, s, l, a) {
 
         return 1;
 
-    }
+    };
+
+function Pattern(image, repeatType) {
+
+    this.image = image;
+    this.repeatType = repeatType;
+
+}
+
+    Pattern.prototype.draw = function (context) {
+
+        if (this.repeatType !== "repeat" && this.repeatType !== "repeat-x" && this.repeatType !== "repeat-y" && this.repeatType !== "no-repeat")
+
+            this.repeatType = "repeat";
+
+        context = context.x ? Canvas5.currentScene.context : context;
+        context.fillStyle = context.createPattern(this.image, this.repeatType);
+
+        return 1;
+
+    };
 
 function ColorStop(position, color) {
 
