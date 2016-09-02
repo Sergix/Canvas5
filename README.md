@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/Sergix7440/Canvas5/master/canvas5-logo-basic.png" alt="Canvas5"/>
+<img src="https://github.com/Sergix7440/Canvas5/blob/master/img/canvas5-logo-basic.png?raw=true" alt="Canvas5"/>
 ## An easy-to-use JavaScript API for the HTML5 Canvas.
 
 ### About Canvas5
