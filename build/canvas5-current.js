@@ -2232,7 +2232,7 @@ function Pattern(image, repeatType) {
             this.repeatType = "repeat";
 
         context = context.x ? Canvas5.currentScene.context : context;
-        context.fillStyle = context.createPattern(this.image, this.repeatType);
+        context.fillStyle = context.createPattern(this.image.image, this.repeatType);
 
         return 1;
 
