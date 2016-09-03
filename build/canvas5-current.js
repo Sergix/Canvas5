@@ -450,17 +450,72 @@ function Scene(domElement) {
 
                 // Set a local var to current sprite (for shorthand purposes)
                 e = this.sprites[j];
-                
+
                 // Check if we are going to perfrom collision detection on the current sprite
                 if (!e.collide)
-                    break;
+                    continue;
 
                 // Check to see if the sprites are colliding (AABB collision)
                 if (this.sprites[i].x < e.x + e.width && this.sprites[i].x + this.sprites[i].width > e.x && this.sprites[i].y < e.y + e.height && this.sprites[i].y + this.sprites[i].height > e.y) {
 
+                    e.x = e.oldx;
+                    e.y = e.oldy;
+
+                    /*vx1 = e.vx;
+                    vx2 = this.sprites[i].vx;
+                    vy1 = e.vy;
+                    vy2 = this.sprites[i].vy;
+
+                    console.log("Colliding");
+                    R = 0;
+                    sign = 0;
+                    m21 = 1; 
+                    x21 = e.x - this.sprites[i].x; 
+                    y21 = e.y - this.sprites[i].y; 
+                    vx21 = e.vx - this.sprites[i].vx; 
+                    vy21 = e.vy - this.sprites[i].vy; 
+                    vx_cm = (1 * e.vx + 1 * this.sprites[i].vx) / (1 + 1); 
+                    vy_cm = (1 * e.vy + 1 * this.sprites[i].vy) / (1 + 1); 
+
+                    // *** return old velocities if balls are not approaching *** 
+                    if ( (vx21 * x21 + vy21 * y21) >= 0) 
+                        return; 
+
+                    // *** I have inserted the following statements to avoid a zero divide; 
+                    // (for single precision calculations, 
+                    // 1.0E-12 should be replaced by a larger value). ************** 
+                    fy21 = 1.0 - 12 * Math.abs(y21);
+                    if ( Math.abs(x21) < fy21 ) { 
+                        if (x21 < 0) { 
+                            sign = -1; 
+                        } else { 
+                            sign = 1;
+                        } 
+                        x21 = fy21 * sign;
+                    } 
+
+                    // *** update velocities ***
+                    a = y21 / x21; 
+                    dvx2 = -2 * (vx21 +a*vy21) / (( 1 + a * a) * (1 + m21));
+                    vx2 = vx2 + dvx2;
+                    vy2 = vy2 + a * dvx2;
+                    vx1 = vx1 - m21 * dvx2;
+                    vy1 = vy1 - a * m21 * dvx2;
+
+                    // *** velocity correction for inelastic collisions *** 
+                    vx1 = (vx1 - vx_cm)* R + vx_cm;
+                    vy1 = (vy1 - vy_cm)* R + vy_cm;
+                    vx2 = (vx2 - vx_cm)* R + vx_cm;
+                    vy2 = (vy2 - vy_cm)* R + vy_cm;
+
+                    e.vx = vx1;
+                    e.vy = vy1;
+                    this.sprites[i].vx = vx2;
+                    this.sprites[i].vy = vy2;*/
+
                     // Check to see which side the sprite is colliding on and perform a different operation for each
 
-                    // Left
+                    /* Left
                     if (this.sprites[i].vx > 0) {
                         this.sprites[i].moveLeft = false;
 
@@ -501,7 +556,7 @@ function Scene(domElement) {
                         this.sprites[i].y = e.y + e.height;
                     } else {
                         this.sprites[i].moveUp = true;
-                    }
+                    }*/
 
                 } else {
 
@@ -510,6 +565,9 @@ function Scene(domElement) {
                     this.sprites[i].moveRight = true;
                     this.sprites[i].moveDown = true;
                     this.sprites[i].moveUp = true;
+
+                    e.oldx = e.x;
+                    e.oldy = e.y;
 
                 }
 
@@ -924,6 +982,8 @@ function Sprite(spriteSheet) {
     this.scale = [0, 0];
     this.onGround = false;
     this.keybinds = [];
+    this.oldx = this.x;
+    this.oldy = this.y;
 
 }
 
@@ -1587,7 +1647,7 @@ function Button(text, rect) {
 
 function Rect(vector, width, height) {
 
-    this.position = vector;
+    this.vector = vector;
     this.vx = 0;
     this.vy = 0;
     this.width = width;
