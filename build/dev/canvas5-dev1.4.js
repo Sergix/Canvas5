@@ -3,7 +3,7 @@
 */
 
 /*
-* Game Engine dev1.4.1 Original Full Script
+* Game Engine dev1.4 Original Full Script
 * (c) 2016 Sergix
 */
 
@@ -14,7 +14,7 @@
 
 var Canvas5 = {
 
-    version: "dev1.4.1",
+    version: "dev1.4",
 
     mouseX: 0,
     mouseY: 0,
