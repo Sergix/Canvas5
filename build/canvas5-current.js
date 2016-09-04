@@ -593,18 +593,18 @@ function Polygon(vectors) {
 
         // If false, stay silent
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
-
     };
 
     // Draw the line
     Polygon.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         // Define local vars
         var i, context = context || Canvas5.currentScene.context;
@@ -674,18 +674,18 @@ function Line(v1, v2) {
 
         // If false, stay silent
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
-
     };
 
     // Draw the line
     Line.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         // Set drawing parameters
         context.strokeStyle = this.color.getAsString();
@@ -745,18 +745,18 @@ function BezierCurve(vectors) {
 
         // If false, stay silent
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
-
     };
 
     // Draw the curve
     BezierCurve.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         // Define local vars
         var i;
@@ -817,18 +817,18 @@ function QuadraticCurve(vectors) {
 
         // If false, stay silent
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
-
     };
 
     // Draw the curve
     QuadraticCurve.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         // Define local vars
         var i;
@@ -1400,6 +1400,7 @@ function GameMenu() {
 
             // Update the current element
             this.elements[i].update(context);
+            this.elements[i].draw(context)
 
             // If we are dragging an element
             if (this.dragging !== false) {
@@ -1509,18 +1510,18 @@ function Button(text, rect) {
             // Center the text
             this.text.x -= 14;
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
-
     };
 
     // Used to draw the button's text
     Button.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         // Draw the text
         this.text.draw(context);
@@ -1656,18 +1657,18 @@ function Circle(vector, size) {
             // Then enable it
             this.shadow.enable(context);
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
-
     };
 
     // Draw the circle
     Circle.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         context = context || Canvas5.currentScene.context;
 
@@ -1900,14 +1901,6 @@ function MessageBox(text, x, y) {
 
         // If false, stay silent
 
-        // If it is to be drawn automatically
-        if (this.alwaysActive !== false)
-
-            // Then draw it
-            this.draw(context);
-
-        // If false, stay silent
-
     };
 
     // Activate the text, called by the user
@@ -1923,6 +1916,14 @@ function MessageBox(text, x, y) {
 
     // Draw the text using the provided context
     MessageBox.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (!this.alwaysActive)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         context = context || Canvas5.currentScene.context;
 
@@ -1974,8 +1975,10 @@ function Dialogue(text) {
     // Update the current text
     Dialogue.prototype.update = function (context) {
 
+        context = context || Canvas5.currentScene.context;
+
         // Update and draw the text
-        this.text[this.index].update(context);
+        this.text[this.index].active(context);
 
     };
 
