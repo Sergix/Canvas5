@@ -422,6 +422,10 @@ function Scene(domElement) {
         // Define local vars
         var i, j, e;
 
+        // Loop through sprites and update each
+        for (i = 0; i < this.sprites.length; i++)
+            this.sprites[i].update(this.context);
+
         // Loop through sprites for checking against other sprites
         for (i = 0; i < this.sprites.length; i++) {
 
@@ -460,15 +464,11 @@ function Scene(domElement) {
 
                     e.x = e.oldx;
                     e.y = e.oldy;
-                    e.vx = 0;
-                    e.vy = 0;
-                    e.canMove = false;
 
                 } else {
 
                     e.oldx = e.x;
                     e.oldy = e.y;
-                    e.canMove = true;
 
                 }
 
@@ -499,14 +499,12 @@ function Scene(domElement) {
     // Render the current scene and all its current and visible objects
     Scene.prototype.render = function () {
 
+        var set, result;
+
         // Render the background
-        var set = this.background.draw(new Vector(0, 0));
+        set = this.background.draw(new Vector(0, 0));
         if (set)
             this.context.fillRect(0, 0, this.width, this.height);
-
-        // Loop through sprites and update each
-        for (i = 0; i < this.sprites.length; i++)
-            this.sprites[i].update(this.context);
 
         // If showInfo is true, display information about the scene (n of sprites being rendered)
         if (this.showInfo) {
@@ -517,10 +515,14 @@ function Scene(domElement) {
 
         }
 
+        // Loop through sprites and draw each
+        for (i = 0; i < this.sprites.length; i++)
+            this.sprites[i].draw(this.context);
+
         // Loop though actions
         for (i = 0; i < this.actionList.length; i++) {
 
-            var result = this.actionList[i].condition();
+            result = this.actionList[i].condition();
 
             // If user defined action portion
             if (this.actionList[i].action && result)
@@ -977,14 +979,11 @@ function Sprite(spriteSheet) {
         } // If false, stay silent
 
         // Update the position and velocity
-        if (this.canMove) {
+        this.vx += this.ax;
+        this.vy += this.ay;
+        this.x += this.vx;
+        this.y += this.vy;
 
-            this.vx += this.ax;
-            this.vy += this.ay;
-            this.x += this.vx;
-            this.y += this.vy;
-
-        }
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -994,13 +993,6 @@ function Sprite(spriteSheet) {
 
         // If false, stay silent
 
-        // If the object is visible
-        if (this.visible)
-
-            // Then draw it
-            this.draw(context);
-
-         // If false, stay silent
     };
 
     Sprite.prototype.transform = function (rotate, scale) {
@@ -1012,6 +1004,14 @@ function Sprite(spriteSheet) {
 
     // Draw the sprite on the provided context
     Sprite.prototype.draw = function (context) {
+
+        // If the object is not visible
+        if (!this.visible)
+
+            // Then exit function
+            return;
+
+         // If false, stay silent
 
         // If we are to transform the sprite
         if (this.rotate !== 0 || this.scale[0] !== 0 || this.scale[1] !== 0) {
