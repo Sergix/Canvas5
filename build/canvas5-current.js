@@ -460,114 +460,15 @@ function Scene(domElement) {
 
                     e.x = e.oldx;
                     e.y = e.oldy;
-
-                    /*vx1 = e.vx;
-                    vx2 = this.sprites[i].vx;
-                    vy1 = e.vy;
-                    vy2 = this.sprites[i].vy;
-
-                    console.log("Colliding");
-                    R = 0;
-                    sign = 0;
-                    m21 = 1; 
-                    x21 = e.x - this.sprites[i].x; 
-                    y21 = e.y - this.sprites[i].y; 
-                    vx21 = e.vx - this.sprites[i].vx; 
-                    vy21 = e.vy - this.sprites[i].vy; 
-                    vx_cm = (1 * e.vx + 1 * this.sprites[i].vx) / (1 + 1); 
-                    vy_cm = (1 * e.vy + 1 * this.sprites[i].vy) / (1 + 1); 
-
-                    // *** return old velocities if balls are not approaching *** 
-                    if ( (vx21 * x21 + vy21 * y21) >= 0) 
-                        return; 
-
-                    // *** I have inserted the following statements to avoid a zero divide; 
-                    // (for single precision calculations, 
-                    // 1.0E-12 should be replaced by a larger value). ************** 
-                    fy21 = 1.0 - 12 * Math.abs(y21);
-                    if ( Math.abs(x21) < fy21 ) { 
-                        if (x21 < 0) { 
-                            sign = -1; 
-                        } else { 
-                            sign = 1;
-                        } 
-                        x21 = fy21 * sign;
-                    } 
-
-                    // *** update velocities ***
-                    a = y21 / x21; 
-                    dvx2 = -2 * (vx21 +a*vy21) / (( 1 + a * a) * (1 + m21));
-                    vx2 = vx2 + dvx2;
-                    vy2 = vy2 + a * dvx2;
-                    vx1 = vx1 - m21 * dvx2;
-                    vy1 = vy1 - a * m21 * dvx2;
-
-                    // *** velocity correction for inelastic collisions *** 
-                    vx1 = (vx1 - vx_cm)* R + vx_cm;
-                    vy1 = (vy1 - vy_cm)* R + vy_cm;
-                    vx2 = (vx2 - vx_cm)* R + vx_cm;
-                    vy2 = (vy2 - vy_cm)* R + vy_cm;
-
-                    e.vx = vx1;
-                    e.vy = vy1;
-                    this.sprites[i].vx = vx2;
-                    this.sprites[i].vy = vy2;*/
-
-                    // Check to see which side the sprite is colliding on and perform a different operation for each
-
-                    /* Left
-                    if (this.sprites[i].vx > 0) {
-                        this.sprites[i].moveLeft = false;
-
-                        if (!this.sprites[i].moveDown || !this.sprites[i].moveUp)
-                            continue;
-
-                        // Set new sprite x
-                        this.sprites[i].x = e.x - this.sprites[i].width;
-                    } else {
-                        this.sprites[i].moveLeft = true;
-                    }
-
-                    // Right
-                    if (this.sprites[i].vx < 0) {
-                        this.sprites[i].moveRight = false;
-
-                        // Set new sprite x
-                        this.sprites[i].x = e.x + e.width;
-                    } else {
-                        this.sprites[i].moveRight = true;
-                    }
-
-                    // Top
-                    if (this.sprites[i].vy > 0) {
-                        this.sprites[i].moveDown = false;
-
-                        // Set new sprite y
-                        this.sprites[i].y = e.y - this.sprites[i].height;
-                    } else {
-                        this.sprites[i].moveDown = true;
-                    }
-
-                    // Bottom
-                    if (this.sprites[i].vy < 0) {
-                        this.sprites[i].moveUp = false;
-
-                        // Set new sprite y
-                        this.sprites[i].y = e.y + e.height;
-                    } else {
-                        this.sprites[i].moveUp = true;
-                    }*/
+                    e.vx = 0;
+                    e.vy = 0;
+                    e.canMove = false;
 
                 } else {
 
-                    // Set all values to true
-                    this.sprites[i].moveLeft = true;
-                    this.sprites[i].moveRight = true;
-                    this.sprites[i].moveDown = true;
-                    this.sprites[i].moveUp = true;
-
                     e.oldx = e.x;
                     e.oldy = e.y;
+                    e.canMove = true;
 
                 }
 
@@ -984,6 +885,7 @@ function Sprite(spriteSheet) {
     this.keybinds = [];
     this.oldx = this.x;
     this.oldy = this.y;
+    this.canMove = true;
 
 }
 
@@ -1074,35 +976,15 @@ function Sprite(spriteSheet) {
 
         } // If false, stay silent
 
-        // Set velocity if collision detection was recently performed
-        if (!this.moveLeft && this.vx > 0)
-            this.vx = 0;
-        else
-            this.moveLeft = true;
-
-        if (!this.moveRight && this.vx < 0)
-            this.vx = 0;
-        else
-            this.moveRight = true;
-
-        if (!this.moveDown && this.vy > 0) {
-            this.onGround = true;
-            this.vy = 0;
-        } else {
-            this.onGround = false;
-            this.moveDown = true;
-        }
-
-        if (!this.moveUp && this.vy < 0)
-            this.vy = 0;
-        else
-            this.moveUp = true;
-
         // Update the position and velocity
-        this.vx += this.ax;
-        this.vy += this.ay;
-        this.x += this.vx;
-        this.y += this.vy;
+        if (this.canMove) {
+
+            this.vx += this.ax;
+            this.vy += this.ay;
+            this.x += this.vx;
+            this.y += this.vy;
+
+        }
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -1244,6 +1126,9 @@ function Sprite(spriteSheet) {
     // Called if event listener is active
     Sprite.prototype.onKeyDownPlatformer = function (evt) {
 
+        if (!this.canMove)
+            return;
+
         // Switch for the current key code
         switch (evt.keyCode) {
 
@@ -1298,6 +1183,9 @@ function Sprite(spriteSheet) {
 
     // Called if event listener is active
     Sprite.prototype.onKeyDown = function (evt) {
+
+        if (!this.canMove)
+            return;
 
         // Switch for the current key code
         switch (evt.keyCode) {
