@@ -440,7 +440,12 @@ function Scene(domElement) {
                 if (this.sprites[i].x < 0) this.sprites[i].x = 0;
                 if (this.sprites[i].x + this.sprites[i].width > this.sprites[i].boundaries.width) this.sprites[i].x = this.sprites[i].boundaries.width - this.sprites[i].width;
                 if (this.sprites[i].y < 0) this.sprites[i].y = 0;
-                if (this.sprites[i].y + this.sprites[i].height > this.sprites[i].boundaries.height) this.sprites[i].y = this.sprites[i].boundaries.height - this.sprites[i].height;
+                if (this.sprites[i].y + this.sprites[i].height > this.sprites[i].boundaries.height) {
+
+                    this.sprites[i].y = this.sprites[i].boundaries.height - this.sprites[i].height;
+                    this.sprites[i].onGround = true;
+
+                }
             }
 
             // Loop though sprites
@@ -456,7 +461,8 @@ function Scene(domElement) {
                 e = this.sprites[j];
 
                 // Check if we are going to perfrom collision detection on the current sprite
-                if (!e.collide)
+                if (!e.collide || e.text)
+
                     continue;
 
                 // Check to see if the sprites are colliding (AABB collision)
@@ -464,6 +470,15 @@ function Scene(domElement) {
 
                     e.x = e.oldx;
                     e.y = e.oldy;
+
+                    if (e.y + e.height <= this.sprites[i].y && !e.onGround ) {
+
+                        e.onGround = true;
+                        e.oldy = this.sprites[i].y - e.height;
+                        e.ay = 0;
+                        e.vy = 0;
+
+                    }
 
                 } else {
 
@@ -484,11 +499,13 @@ function Scene(domElement) {
     Scene.prototype.updateAsPlatformer = function (gravity) {
 
         // Define local vars
-        var i;
+        var i, gravity = gravity || 1.9;
 
         for (i = 0; i < this.sprites.length; i++) {
 
-            this.sprites[i].ay = gravity;
+            if (!this.sprites[i].onGround)
+
+                this.sprites[i].ay = gravity;
 
         }
 
@@ -865,6 +882,7 @@ function Sprite(spriteSheet) {
     this.x = 0;
     this.y = 0;
     this.speed = 0;
+    this.jumpHeight = 0;
     this.vx = 0;
     this.vy = 0;
     this.ax = 0;
@@ -941,19 +959,21 @@ function Sprite(spriteSheet) {
     Sprite.prototype.jump = function (velocity, gravity, onGround) {
 
         // Incase onGround was undefined then set it to true
-        onGround = onGround || true;
+        onGround = onGround || false;
 
         // If the player can only jump if he is on the ground
         if (!this.onGround && onGround) 
         
             // Then return nothing
-            return 0;
+            return;
 
         // If false, stay silent
 
         // Set the velocity and acceleration of the sprite
         this.vy = -velocity;
         this.ay = gravity;
+
+        this.onGround = false;
 
     };
 
@@ -1074,10 +1094,11 @@ function Sprite(spriteSheet) {
 
     };
 
-    Sprite.prototype.addPlatformerControls = function (movementSpeed) {
+    Sprite.prototype.addPlatformerControls = function (movementSpeed, jumpHeight) {
 
         // Set the speed property of the sprite
         this.speed = movementSpeed;
+        this.jumpHeight = jumpHeight;
 
         // Add event listeners to the provided DOM object
         window.addEventListener('keydown', bind(this, this.onKeyDownPlatformer), false);
@@ -1139,7 +1160,7 @@ function Sprite(spriteSheet) {
             case 83: this.vy = this.speed; break;
             case 39: this.vx = this.speed; break;
             case 68: this.vx = this.speed; break;
-            case 32: this.jump(this.speed, this.speed * 1.4); break;
+            case 32: this.jump(this.jumpHeight, 1.9, true); break;
             default: break;
 
         }
