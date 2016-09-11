@@ -258,6 +258,7 @@ function Scene(domElement) {
     this.imageData = null;
     this.background = null;
     this.showInfo = false;
+    this.boundaries = null;
 
 }
 
@@ -437,12 +438,24 @@ function Scene(domElement) {
 
             // Check sprite boundaries
             if (this.sprites[i].boundaries !== null) {
-                if (this.sprites[i].x < 0) this.sprites[i].x = 0;
-                if (this.sprites[i].x + this.sprites[i].width > this.sprites[i].boundaries.width) this.sprites[i].x = this.sprites[i].boundaries.width - this.sprites[i].width;
-                if (this.sprites[i].y < 0) this.sprites[i].y = 0;
-                if (this.sprites[i].y + this.sprites[i].height > this.sprites[i].boundaries.height) {
+                if (this.sprites[i].x < this.sprites[i].boundaries[0]) this.sprites[i].x = this.sprites[i].boundaries[0];
+                if (this.sprites[i].x + this.sprites[i].width > this.sprites[i].boundaries[3]) this.sprites[i].x = this.sprites[i].boundaries[3] - this.sprites[i].width;
+                if (this.sprites[i].y < this.sprites[i].boundaries[1]) this.sprites[i].y = this.sprites[i].boundaries[1];
+                if (this.sprites[i].y + this.sprites[i].height > this.sprites[i].boundaries[4]) {
 
-                    this.sprites[i].y = this.sprites[i].boundaries.height - this.sprites[i].height;
+                    this.sprites[i].y = this.sprites[i].boundaries[4] - this.sprites[i].height;
+                    this.sprites[i].onGround = true;
+
+                }
+            }
+
+            if (this.boundaries !== null) {
+                if (this.sprites[i].x < this.boundaries[0]) this.sprites[i].x = this.boundaries[0];
+                if (this.sprites[i].x + this.sprites[i].width > this.boundaries[3]) this.sprites[i].x = this.boundaries[3] - this.sprites[i].width;
+                if (this.sprites[i].y < this.boundaries[1]) this.sprites[i].y = this.boundaries[1];
+                if (this.sprites[i].y + this.sprites[i].height > this.boundaries[4]) {
+
+                    this.sprites[i].y = this.boundaries[4] - this.sprites[i].height;
                     this.sprites[i].onGround = true;
 
                 }
