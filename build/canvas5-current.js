@@ -244,7 +244,7 @@ window.onload = Canvas5.onloadMessage;
     desc: Used to render the screen and all its added objects.
 */
 
-function Scene(domElement) {
+Canvas5.Scene = function (domElement) {
 
     this.canvas = domElement || document.getElementById("CanvasGame");
     this.context = this.canvas.getContext("2d");
@@ -263,7 +263,7 @@ function Scene(domElement) {
 }
 
     // Pixel Manipulation
-    Scene.prototype.modifyColors =  function (rgba, _area) {
+    Canvas5.Scene.prototype.modifyColors =  function (rgba, _area) {
 
         var area = _area || null;
 
@@ -356,7 +356,7 @@ function Scene(domElement) {
     };
 
     // Get the current color values form last call to modifyColors
-    Scene.prototype.getColors = function () {
+    Canvas5.Scene.prototype.getColors = function () {
 
         // Return the colorList array to the user
         return this.colorList;
@@ -364,7 +364,7 @@ function Scene(domElement) {
     };
 
     // Define a new action (function) to be called at rendering time
-    Scene.prototype.newAction = function (fn1, fn2) {
+    Canvas5.Scene.prototype.newAction = function (fn1, fn2) {
 
         // Define local vars
         var action = new Object();
@@ -386,7 +386,7 @@ function Scene(domElement) {
     };
 
     // Add a sprite to be rendered
-    Scene.prototype.add = function (sprite) {
+    Canvas5.Scene.prototype.add = function (sprite) {
 
         // Push the sprite to the sprites array
         this.sprites.push(sprite);
@@ -394,7 +394,7 @@ function Scene(domElement) {
     };
 
     // Add a new menu to the scene to be rendered
-    Scene.prototype.addMenu = function (menu) {
+    Canvas5.Scene.prototype.addMenu = function (menu) {
 
         // Push the menu to the menuList array
         this.menuList.push(menu);
@@ -402,7 +402,7 @@ function Scene(domElement) {
     };
 
     // Remove a sprite from the sprites array
-    Scene.prototype.remove = function (sprite) {
+    Canvas5.Scene.prototype.remove = function (sprite) {
 
         // Get the index of the sprite to be removed in the sprites array
         var index = this.sprites.indexOf(sprite);
@@ -418,7 +418,7 @@ function Scene(domElement) {
     };
 
     // Update the scene's collision
-    Scene.prototype.update = function () {
+    Canvas5.Scene.prototype.update = function () {
 
         // Define local vars
         var i, j, e;
@@ -509,7 +509,7 @@ function Scene(domElement) {
     };
 
     // Update the scene's collision
-    Scene.prototype.updateAsPlatformer = function (gravity) {
+    Canvas5.Scene.prototype.updateAsPlatformer = function (gravity) {
 
         // Define local vars
         var i, gravity = gravity || 1.9;
@@ -527,12 +527,12 @@ function Scene(domElement) {
     };
 
     // Render the current scene and all its current and visible objects
-    Scene.prototype.render = function () {
+    Canvas5.Scene.prototype.render = function () {
 
         var set, result;
 
         // Render the background
-        set = this.background.draw(new Vector(0, 0));
+        set = this.background.draw(new Canvas5.Vector(0, 0));
         if (set)
             this.context.fillRect(0, 0, this.width, this.height);
 
@@ -576,7 +576,7 @@ function Scene(domElement) {
     desc: Contains data about a certain defined point on the canvas
 */
 
-function Vector(x, y) {
+Canvas5.Vector = function (x, y) {
 
     this.x = x;
     this.y = y;
@@ -589,7 +589,7 @@ function Vector(x, y) {
     desc: Used to draw a polygon on a scene
 */
 
-function Polygon(vectors) {
+Canvas5.Polygon = function (vectors) {
 
     this.vectors = vectors;
     this.color = RGBSet(0, 0, 0);
@@ -602,7 +602,7 @@ function Polygon(vectors) {
 }
 
     // Updates shadows and other properties
-    Polygon.prototype.update = function (context) {
+    Canvas5.Polygon.prototype.update = function (context) {
 
         // If vectors attribute is not an array
         if (typeof this.vectors !== "object") {
@@ -626,7 +626,7 @@ function Polygon(vectors) {
     };
 
     // Draw the line
-    Polygon.prototype.draw = function (context) {
+    Canvas5.Polygon.prototype.draw = function (context) {
 
         // If the object is not visible
         if (this.visible)
@@ -683,7 +683,7 @@ function Polygon(vectors) {
     desc: Used to draw a simple line between two vectors on a scene
 */
 
-function Line(v1, v2) {
+Canvas5.Line = function (v1, v2) {
 
     this.vectors = [v1, v2];
     this.color = RGBSet(0, 0, 0);
@@ -694,7 +694,7 @@ function Line(v1, v2) {
 }
 
     // Updates shadows and other properties
-    Line.prototype.update = function (context) {
+    Canvas5.Line.prototype.update = function (context) {
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -707,7 +707,7 @@ function Line(v1, v2) {
     };
 
     // Draw the line
-    Line.prototype.draw = function (context) {
+    Canvas5.Line.prototype.draw = function (context) {
 
         // If the object is not visible
         if (this.visible)
@@ -743,7 +743,7 @@ function Line(v1, v2) {
     desc: Draws a bezier (2-contol point) curve
 */
 
-function BezierCurve(vectors) {
+Canvas5.BezierCurve = function (vectors) {
 
     this.vectors = vectors;
     this.shadow = null;
@@ -752,7 +752,7 @@ function BezierCurve(vectors) {
 }
 
     // Update the curve
-    BezierCurve.prototype.update = function (context) {
+    Canvas5.BezierCurve.prototype.update = function (context) {
 
         context = context || Canvas5.currentScene.context;
 
@@ -778,7 +778,7 @@ function BezierCurve(vectors) {
     };
 
     // Draw the curve
-    BezierCurve.prototype.draw = function (context) {
+    Canvas5.BezierCurve.prototype.draw = function (context) {
 
         // If the object is not visible
         if (this.visible)
@@ -817,7 +817,7 @@ function BezierCurve(vectors) {
     desc: Draws a quadratic (1-contol point) curve
 */
 
-function QuadraticCurve(vectors) {
+Canvas5.QuadraticCurve = function (vectors) {
 
     this.vectors = vectors;
     this.shadow = null;
@@ -826,7 +826,7 @@ function QuadraticCurve(vectors) {
 }
 
     // Update the curve
-    QuadraticCurve.prototype.update = function (context) {
+    Canvas5.QuadraticCurve.prototype.update = function (context) {
 
         // If length is not valid
         if (this.vectors.length !== 3) {
@@ -850,7 +850,7 @@ function QuadraticCurve(vectors) {
     };
 
     // Draw the curve
-    QuadraticCurve.prototype.draw = function (context) {
+    Canvas5.QuadraticCurve.prototype.draw = function (context) {
 
         // If the object is not visible
         if (this.visible)
@@ -889,9 +889,9 @@ function QuadraticCurve(vectors) {
     desc: Defines an object that can be used to draw an image on the screen with other various modifiable properties
 */
 
-function Sprite(spriteSheet) {
+Canvas5.Sprite = function(spriteSheet) {
 
-    this.spriteSheet = spriteSheet || new SpriteSheet(null, 0, 0);
+    this.spriteSheet = spriteSheet || new Canvas5.SpriteSheet(null, 0, 0);
     this.x = 0;
     this.y = 0;
     this.speed = 0;
@@ -923,7 +923,7 @@ function Sprite(spriteSheet) {
 }
 
     // Check if the sprite is near the other specified sprite by "units" pixels
-    Sprite.prototype.near = function (sprite, units) {
+    Canvas5.Sprite.prototype.near = function (sprite, units) {
 
         // If true
         if (Canvas5.distance(this.x, this.y, sprite.x, sprite.y) <= units)
@@ -938,14 +938,14 @@ function Sprite(spriteSheet) {
     };
 
     // Set the name of the sprite to be visibly rendered
-    Sprite.prototype.setName = function (text) {
+    Canvas5.Sprite.prototype.setName = function (text) {
 
         this.name = text;
 
     };
 
     // Set the (x,y) position of the sprite
-    Sprite.prototype.setPosition = function (x, y) {
+    Canvas5.Sprite.prototype.setPosition = function (x, y) {
 
         this.x = x;
         this.y = y;
@@ -953,7 +953,7 @@ function Sprite(spriteSheet) {
     };
 
     // Set the (x,y) velocity of the sprite
-    Sprite.prototype.setVelocity = function (vx, vy) {
+    Canvas5.Sprite.prototype.setVelocity = function (vx, vy) {
 
         this.vx = vx;
         this.vy = vy;
@@ -961,7 +961,7 @@ function Sprite(spriteSheet) {
     };
 
     // Set the (x,y) acceleration of the object
-    Sprite.prototype.setAccel = function (ax, ay) {
+    Canvas5.Sprite.prototype.setAccel = function (ax, ay) {
 
         this.ax = ax;
         this.ay = ay;
@@ -969,7 +969,7 @@ function Sprite(spriteSheet) {
     };
 
     // Make the sprite jump using the provided velocity and gravity
-    Sprite.prototype.jump = function (velocity, gravity, onGround) {
+    Canvas5.Sprite.prototype.jump = function (velocity, gravity, onGround) {
 
         // Incase onGround was undefined then set it to true
         onGround = onGround || false;
@@ -991,7 +991,7 @@ function Sprite(spriteSheet) {
     };
 
     // Used to update the sprite's collision, position, and animation frame
-    Sprite.prototype.update = function (context) {
+    Canvas5.Sprite.prototype.update = function (context) {
 
         // If the scale is 0
         if (this.scale === [0, 0])
@@ -1028,7 +1028,7 @@ function Sprite(spriteSheet) {
 
     };
 
-    Sprite.prototype.transform = function (rotate, scale) {
+    Canvas5.Sprite.prototype.transform = function (rotate, scale) {
 
         this.rotate = rotate;
         this.scale = scale;
@@ -1036,7 +1036,7 @@ function Sprite(spriteSheet) {
     };
 
     // Draw the sprite on the provided context
-    Sprite.prototype.draw = function (context) {
+    Canvas5.Sprite.prototype.draw = function (context) {
 
         // If the object is not visible
         if (!this.visible)
@@ -1055,7 +1055,7 @@ function Sprite(spriteSheet) {
             context.scale(this.scale[0], this.scale[1]);
 
             // Draw the image on the canvas at (x,y) at the current frame
-            this.spriteSheet.draw(context, new Vector(this.x, this.y));
+            this.spriteSheet.draw(context, new Canvas5.Vector(this.x, this.y));
 
             // Draw the new coord system
             context.restore();
@@ -1063,7 +1063,7 @@ function Sprite(spriteSheet) {
         } else
 
             // Otherwise, draw the image on the canvas at (x,y) at the current frame
-            this.spriteSheet.draw(context, new Vector(this.x, this.y));
+            this.spriteSheet.draw(context, new Canvas5.Vector(this.x, this.y));
         
         // If the name property is not set
         if (this.name !== null) {
@@ -1088,7 +1088,7 @@ function Sprite(spriteSheet) {
     };
 
     // Add a new keybind that will run (fn) upon press
-    Sprite.prototype.addKeybind = function (key, fn) {
+    Canvas5.Sprite.prototype.addKeybind = function (key, fn) {
 
         // Push the keybind object to the keybinds array property
         this.keybinds.push({ key: key, fn: fn });
@@ -1096,39 +1096,39 @@ function Sprite(spriteSheet) {
     };
 
     // Add basic keyboard controls to the sprite
-    Sprite.prototype.addBasicControls = function (movementSpeed) {
+    Canvas5.Sprite.prototype.addBasicControls = function (movementSpeed) {
 
         // Set the speed property of the sprite
         this.speed = movementSpeed;
 
         // Add event listeners to the provided DOM object
-        window.addEventListener('keydown', bind(this, this.onKeyDown), false);
-        window.addEventListener('keyup', bind(this, this.onKeyUp), false);
+        window.addEventListener('keydown', this.onKeyDown, false);
+        window.addEventListener('keyup', this, this.onKeyUp, false);
 
     };
 
-    Sprite.prototype.addPlatformerControls = function (movementSpeed, jumpHeight) {
+    Canvas5.Sprite.prototype.addPlatformerControls = function (movementSpeed, jumpHeight) {
 
         // Set the speed property of the sprite
         this.speed = movementSpeed;
         this.jumpHeight = jumpHeight;
 
         // Add event listeners to the provided DOM object
-        window.addEventListener('keydown', bind(this, this.onKeyDownPlatformer), false);
-        window.addEventListener('keyup', bind(this, this.onKeyUpPlatformer), false);
+        window.addEventListener('keydown', this.onKeyDownPlatformer, false);
+        window.addEventListener('keyup', this.onKeyUpPlatformer, false);
 
     };
 
     // Add an event listener for the mouse to the sprite
-    Sprite.prototype.addMouseListener = function () {
+    Canvas5.Sprite.prototype.addMouseListener = function () {
 
         // Add event listeners to the provided DOM object
-        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+        window.addEventListener('mousedown', this.onMouseDown, false);
+        window.addEventListener('mouseup',this.onMouseUp, false);
     };
 
     // Called if event listener is active
-    Sprite.prototype.onMouseDown = function (evt) {
+    Canvas5.Sprite.prototype.onMouseDown = function (evt) {
 
         // Switch for button code
         switch (evt.button) {
@@ -1150,7 +1150,7 @@ function Sprite(spriteSheet) {
     };
 
     // Called if event listener is active
-    Sprite.prototype.onMouseUp = function (evt) {
+    Canvas5.Sprite.prototype.onMouseUp = function (evt) {
 
         // Set the clicked property to false
         this.clicked = false;
@@ -1158,7 +1158,7 @@ function Sprite(spriteSheet) {
     };
 
     // Called if event listener is active
-    Sprite.prototype.onKeyDownPlatformer = function (evt) {
+    Canvas5.Sprite.prototype.onKeyDownPlatformer = function (evt) {
 
         if (!this.canMove)
             return;
@@ -1181,7 +1181,7 @@ function Sprite(spriteSheet) {
     };
 
     // Called if event listener is active
-    Sprite.prototype.onKeyUpPlatformer = function (evt) {
+    Canvas5.Sprite.prototype.onKeyUpPlatformer = function (evt) {
 
         // Switch for current key code
         switch (evt.keyCode) {
@@ -1216,7 +1216,7 @@ function Sprite(spriteSheet) {
     };
 
     // Called if event listener is active
-    Sprite.prototype.onKeyDown = function (evt) {
+    Canvas5.Sprite.prototype.onKeyDown = function (evt) {
 
         if (!this.canMove)
             return;
@@ -1255,7 +1255,7 @@ function Sprite(spriteSheet) {
     };
 
     // Called if event listener is active
-    Sprite.prototype.onKeyUp = function (evt) {
+    Canvas5.Sprite.prototype.onKeyUp = function (evt) {
 
         // Switch for current key code
         switch (evt.keyCode) {
@@ -1280,7 +1280,7 @@ function Sprite(spriteSheet) {
     desc: Creates a visible menu that can contain buttons and other text that can be clicked
 */
 
-function GameMenu() {
+Canvas5.GameMenu = function () {
 
     this.x = 0;
     this.y = 0;
@@ -1296,7 +1296,7 @@ function GameMenu() {
 }
 
     // Add a new element to the menu
-    GameMenu.prototype.add = function (element) {
+    Canvas5.GameMenu.prototype.add = function (element) {
 
         // Push the provided element to the elements array
         this.elements.push(element);
@@ -1304,17 +1304,17 @@ function GameMenu() {
     };
 
     // Add a mouse event listener to the menu
-    GameMenu.prototype.addMouseListener = function () {
+    Canvas5.GameMenu.prototype.addMouseListener = function () {
 
         // Add a listener to the provided DOM object
-        window.addEventListener('mousemove', bind(this, this.onMouseMove), false);
-        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+        window.addEventListener('mousemove', this.onMouseMove, false);
+        window.addEventListener('mousedown', this.onMouseDown, false);
+        window.addEventListener('mouseup', this.onMouseUp, false);
 
     };
 
     // Called if event listener is active
-    GameMenu.prototype.onMouseMove = function (evt) {
+    Canvas5.GameMenu.prototype.onMouseMove = function (evt) {
 
         // If we are dragging the mouse
         if (this.dragging !== false) {
@@ -1328,7 +1328,7 @@ function GameMenu() {
     };
 
     // Called if event listener is active
-    GameMenu.prototype.onMouseDown = function (evt) {
+    Canvas5.GameMenu.prototype.onMouseDown = function (evt) {
 
         // Switch for mouse button code
         switch (evt.button) {
@@ -1373,7 +1373,7 @@ function GameMenu() {
     };
 
     // Called if event listener is active
-    GameMenu.prototype.onMouseUp = function (evt) {
+    Canvas5.GameMenu.prototype.onMouseUp = function (evt) {
 
         // Set the dragging property to false
         this.dragging = false;
@@ -1381,7 +1381,7 @@ function GameMenu() {
     };
 
     // Updates the menu
-    GameMenu.prototype.update = function (context, active) {
+    Canvas5.GameMenu.prototype.update = function (context, active) {
 
         // If edit mode is enabled
         if (this.editMode)
@@ -1411,7 +1411,7 @@ function GameMenu() {
     };
 
     // Updates the menu, used if the alwaysActive property is false
-    GameMenu.prototype.active = function (scene) {
+    Canvas5.GameMenu.prototype.active = function (scene) {
 
         // If we have a current scene set up, use that
         scene = scene || Canvas5.currentScene;
@@ -1422,9 +1422,9 @@ function GameMenu() {
     };
 
     // Draw the menu
-    GameMenu.prototype.draw = function (context) {
+    Canvas5.GameMenu.prototype.draw = function (context) {
 
-        var set = this.background.draw(new Vector(this.x, this.y));
+        var set = this.background.draw(new Canvas5.Vector(this.x, this.y));
         
         if (set)
             context.fillRect(this.x, this.y, this.width, this.height);
@@ -1455,7 +1455,7 @@ function GameMenu() {
     desc: A simple button that can be clicked and can be set to any color and can use any text
 */
 
-function Button(text, rect) {
+Canvas5.Button = function (text, rect) {
 
     this.x = 0;
     this.y = 0;
@@ -1469,16 +1469,16 @@ function Button(text, rect) {
 }
 
     // Add a mouse event listener to the button
-    Button.prototype.addMouseListener = function () {
+    Canvas5.Button.prototype.addMouseListener = function () {
 
         // Bind listener functions to mouse events using the provided DOM object
-        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
-        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
+        window.addEventListener('mousedown', this.onMouseDown, false);
+        window.addEventListener('mouseup', this.onMouseUp, false);
 
     };
 
     // Called if event listener is active
-    Button.prototype.onMouseDown = function (evt) {
+    Canvas5.Button.prototype.onMouseDown = function (evt) {
 
         // Switch through mouse buttons
         switch (evt.button) {
@@ -1501,7 +1501,7 @@ function Button(text, rect) {
     };
 
     // Called if event listener is active
-    Button.prototype.onMouseUp = function (evt) {
+    Canvas5.Button.prototype.onMouseUp = function (evt) {
 
         // Set the clicked property to false
         this.clicked = false;
@@ -1509,7 +1509,7 @@ function Button(text, rect) {
     };
 
     // Set the position of the button
-    Button.prototype.setPosition = function (x, y) {
+    Canvas5.Button.prototype.setPosition = function (x, y) {
 
         // Set the (x,y) of the button
         this.x = x;
@@ -1518,7 +1518,7 @@ function Button(text, rect) {
     };
 
     // Update the button using the provided context
-    Button.prototype.update = function (context) {
+    Canvas5.Button.prototype.update = function (context) {
 
         // Draw the button's shape
         this.rect.draw(context);
@@ -1527,7 +1527,7 @@ function Button(text, rect) {
         if (Canvas5.mouseX >= this.x && Canvas5.mouseX <= this.x + this.rect.width && Canvas5.mouseY >= this.y && Canvas5.mouseY <= this.y + this.rect.height)
 
             // Then draw the button using a slightly lighter color
-            this.rect.draw(context, new RGBASet(this.rect.color.r + 50, this.rect.color.g + 50, this.rect.color.b + 50, this.rect.color.a));
+            this.rect.draw(context, new Canvas5.RGBASet(this.rect.color.r + 50, this.rect.color.g + 50, this.rect.color.b + 50, this.rect.color.a));
 
         // If false, stay silent
 
@@ -1547,7 +1547,7 @@ function Button(text, rect) {
     };
 
     // Used to draw the button's text
-    Button.prototype.draw = function (context) {
+    Canvas5.Button.prototype.draw = function (context) {
 
         // If the object is not visible
         if (this.visible)
@@ -1568,14 +1568,14 @@ function Button(text, rect) {
     desc: A rectangle that can be drawn at any width and height
 */
 
-function Rect(vector, width, height) {
+Canvas5.Rect = function (vector, width, height) {
 
     this.vector = vector;
     this.vx = 0;
     this.vy = 0;
     this.width = width;
     this.height = height;
-    this.color = new RGBASet(100, 100, 100, 1);
+    this.color = new Canvas5.RGBASet(100, 100, 100, 1);
     this.border = this.color;
     this.borderWidth = 2;
     this.shadow = null;
@@ -1586,7 +1586,7 @@ function Rect(vector, width, height) {
 
 
     // Set the rect's position to (x,y)
-    Rect.prototype.setPosition = function (x, y) {
+    Canvas5.Rect.prototype.setPosition = function (x, y) {
 
         // Set the (x,y) properties
         this.vector.x = x;
@@ -1595,7 +1595,7 @@ function Rect(vector, width, height) {
     };
 
     // Upadte the rect using the provided context
-    Rect.prototype.update = function (context) {
+    Canvas5.Rect.prototype.update = function (context) {
 
         // Update the (x,y) using the set velocity
         this.vector.x += this.vx;
@@ -1618,7 +1618,7 @@ function Rect(vector, width, height) {
     };
 
     // Draw the rect using the provided context and color
-    Rect.prototype.draw = function (context, color) {
+    Canvas5.Rect.prototype.draw = function (context, color) {
 
         context = context || Canvas5.currentScene.context;
 
@@ -1654,13 +1654,13 @@ function Rect(vector, width, height) {
     desc: A simple circle that can be drawn using any radius
 */
 
-function Circle(vector, size) {
+Canvas5.Circle = function (vector, size) {
 
     this.vector = vector;
     this.vx = 0;
     this.vy = 0;
     this.radius = size;
-    this.color = new RGBSet(255, 255, 255);
+    this.color = new Canvas5.RGBSet(255, 255, 255);
     this.border = this.color;
     this.borderWidth = 2;
     this.shadow = null;
@@ -1670,7 +1670,7 @@ function Circle(vector, size) {
 
 
     // Set the position of the circle
-    Circle.prototype.setPosition = function (vector) {
+    Canvas5.Circle.prototype.setPosition = function (vector) {
 
         // Set the (x,y) property to (x,y)
         this.vector.x = vector.x;
@@ -1679,7 +1679,7 @@ function Circle(vector, size) {
     };
 
     // Update the circle
-    Circle.prototype.update = function (context) {
+    Canvas5.Circle.prototype.update = function (context) {
 
         // Update the (x,y) property using the set velocity
         this.vector.x += this.vx;
@@ -1694,7 +1694,7 @@ function Circle(vector, size) {
     };
 
     // Draw the circle
-    Circle.prototype.draw = function (context) {
+    Canvas5.Circle.prototype.draw = function (context) {
 
         // If the object is not visible
         if (this.visible)
@@ -1731,7 +1731,7 @@ function Circle(vector, size) {
     desc: Establishes a connection to a WebSocket and can be used to send and pull data from it
 */
 
-function Client(url) {
+Canvas5.Client = function(url) {
 
     this.url = url;
     this.server = new WebSocket(url);
@@ -1749,7 +1749,7 @@ function Client(url) {
 }
 
     // Called on messages or events from the socket
-    Client.prototype.event = function (event) {
+    Canvas5.Client.prototype.event = function (event) {
 
         // Set the currentData property to whatever was sent
         this.currentData = event;
@@ -1757,7 +1757,7 @@ function Client(url) {
     };
 
     // Send a new message to the socket
-    Client.prototype.sendMessage = function (data) {
+    Canvas5.Client.prototype.sendMessage = function (data) {
 
         // Send the data
         this.server.send(data);
@@ -1765,7 +1765,7 @@ function Client(url) {
     };
 
     // Get the last message recieved from the socket
-    Client.prototype.getMessage = function () {
+    Canvas5.Client.prototype.getMessage = function () {
 
         // Return the data to the user
         return this.currentData.data;
@@ -1777,14 +1777,14 @@ function Client(url) {
     desc: Sets key:value pairs in the localStorage of the browser
 */
 
-function LocalStorageSet() {
+Canvas5.LocalStorageSet = function () {
 
     this.keyList = [];
 
 }
 
     // Create a new key:value pair
-    LocalStorageSet.prototype.newItem = function (key, value) {
+    Canvas5.LocalStorageSet.prototype.newItem = function (key, value) {
 
         // Set the data in the global localStorage database
         localStorage.setItem(key, value);
@@ -1795,7 +1795,7 @@ function LocalStorageSet() {
     };
 
     // Get an item set in localStorage
-    LocalStorageSet.prototype.getItem = function (key) {
+    Canvas5.LocalStorageSet.prototype.getItem = function (key) {
 
         // Return the data to the user
         return localStorage.getItem(key);
@@ -1803,7 +1803,7 @@ function LocalStorageSet() {
     };
 
     // Get all the items that have been set in localStorage (through this instance)
-    LocalStorageSet.prototype.getAllItems = function () {
+    Canvas5.LocalStorageSet.prototype.getAllItems = function () {
 
         // Define local vars
         var temp = [], i;
@@ -1820,7 +1820,7 @@ function LocalStorageSet() {
     };
 
     // Clear the localStorage
-    LocalStorageSet.prototype.clear = function () {
+    Canvas5.LocalStorageSet.prototype.clear = function () {
 
         // Define local vars
         var index, i;
@@ -1843,7 +1843,7 @@ function LocalStorageSet() {
     desc: Creates a new HTML audio element that can be played using JavaScript
 */
 
-function AudioElement(src) {
+Canvas5.AudioElement = function (src) {
 
     this.domElement = document.createElement('audio');
     this.src = src;
@@ -1855,7 +1855,7 @@ function AudioElement(src) {
 }
 
     // Play the audio
-    AudioElement.prototype.play = function () {
+    Canvas5.AudioElement.prototype.play = function () {
 
         // Play the audio using the audio HTML element
         this.domElement.play();
@@ -1863,7 +1863,7 @@ function AudioElement(src) {
     };
 
     // Pause the audio
-    AudioElement.prototype.pause = function () {
+    Canvas5.AudioElement.prototype.pause = function () {
 
         // Pause the audio using the audio HTML element
         this.domElement.pause();
@@ -1871,7 +1871,7 @@ function AudioElement(src) {
     };
 
     // Pause the audio and rewind it to the beginning
-    AudioElement.prototype.stop = function () {
+    Canvas5.AudioElement.prototype.stop = function () {
 
         // Pause the audio
         this.pause();
@@ -1882,7 +1882,7 @@ function AudioElement(src) {
     };
 
     // Set the audio play time
-    AudioElement.prototype.setTime = function (time) {
+    Canvas5.AudioElement.prototype.setTime = function (time) {
 
         // Change the currentTime DOM property of the audio
         this.domElement.currentTime = time;
@@ -1890,7 +1890,7 @@ function AudioElement(src) {
     };
 
     // Set the audio volume
-    AudioElement.prototype.setVolume = function (volume) {
+    Canvas5.AudioElement.prototype.setVolume = function (volume) {
 
         // Change the volume DOM property of the audio
         this.domElement.volume = volume;
@@ -1902,13 +1902,13 @@ function AudioElement(src) {
     desc: A block of text that can be drawn on the screen
 */
 
-function MessageBox(text, x, y) {
+Canvas5.MessageBox = function (text, x, y) {
 
     this.x = x || 0;
     this.y = y || 0;
     this.text = text;
     this.font = "12pt sans-serif";
-    this.color = new RGBASet(100, 100, 100, 1);
+    this.color = new Canvas5.RGBASet(100, 100, 100, 1);
     this.shadow = null;
     this.alwaysActive = false;
 
@@ -1916,7 +1916,7 @@ function MessageBox(text, x, y) {
 
 
     // Set the position of the text using (x,y)
-    MessageBox.prototype.setPosition = function (x, y) {
+    Canvas5.MessageBox.prototype.setPosition = function (x, y) {
 
         // Set the (x,y) position of the text
         this.x = x;
@@ -1925,7 +1925,7 @@ function MessageBox(text, x, y) {
     };
 
     // Update the text
-    MessageBox.prototype.update = function (context) {
+    Canvas5.MessageBox.prototype.update = function (context) {
 
         // If user defined a shadow
         if (this.shadow !== null)
@@ -1938,7 +1938,7 @@ function MessageBox(text, x, y) {
     };
 
     // Activate the text, called by the user
-    MessageBox.prototype.active = function (scene) {
+    Canvas5.MessageBox.prototype.active = function (scene) {
 
         // If we have a current scene set up, use that
         scene = scene || Canvas5.currentScene;
@@ -1949,7 +1949,7 @@ function MessageBox(text, x, y) {
     };
 
     // Draw the text using the provided context
-    MessageBox.prototype.draw = function (context) {
+    Canvas5.MessageBox.prototype.draw = function (context) {
 
         // If the object is not visible
         if (!this.alwaysActive)
@@ -1983,7 +1983,7 @@ function MessageBox(text, x, y) {
     desc: Uses a MessageBox array to loop through as dialogue
 */
 
-function Dialogue(text) {
+Canvas5.Dialogue = function (text) {
 
     this.text = text;
     this.index = 0;
@@ -1991,7 +1991,7 @@ function Dialogue(text) {
 }
 
     // Go to next line of dialogue
-    Dialogue.prototype.next = function () {
+    Canvas5.Dialogue.prototype.next = function () {
 
         // Increment index
         this.index++;
@@ -2007,7 +2007,7 @@ function Dialogue(text) {
     }
 
     // Update the current text
-    Dialogue.prototype.update = function (context) {
+    Canvas5.Dialogue.prototype.update = function (context) {
 
         context = context || Canvas5.currentScene.context;
 
@@ -2021,7 +2021,7 @@ function Dialogue(text) {
     desc: Used to create a new DOM image
 */
 
-function GameImage(src) {
+Canvas5.GameImage = function (src) {
 
     this.image = new Image();
     this.src = src;
@@ -2031,7 +2031,7 @@ function GameImage(src) {
 
 }
 
-    GameImage.prototype.draw = function (vector, context) {
+    Canvas5.GameImage.prototype.draw = function (vector, context) {
 
         context = context || Canvas5.currentScene.context;
         context.drawImage(this.image, vector.x, vector.y);
@@ -2045,7 +2045,7 @@ function GameImage(src) {
     desc: A collection of images used for animation
 */
 
-function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
+Canvas5.SpriteSheet = function (spriteSheet, spriteWidth, spriteHeight) {
 
     this.image = spriteSheet;
     this.spriteWidth = spriteWidth;
@@ -2056,7 +2056,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
 }
 
     // Draw the SpriteSheet at the current frame
-    SpriteSheet.prototype.draw = function (context, vector) {
+    Canvas5.SpriteSheet.prototype.draw = function (context, vector) {
         
         // If we are going to change the animation frame
         if (this.changeFrame)
@@ -2083,7 +2083,7 @@ function SpriteSheet(spriteSheet, spriteWidth, spriteHeight) {
     desc: Creates a new Red-Green-Blue color value
 */
 
-function RGBSet(r, g, b) {
+Canvas5.RGBSet = function (r, g, b) {
 
     this.r = r;
     this.g = g;
@@ -2093,14 +2093,14 @@ function RGBSet(r, g, b) {
 }
 
     // Get the RGB values as a CSS string
-    RGBSet.prototype.getAsString = function () {
+    Canvas5.RGBSet.prototype.getAsString = function () {
 
         // Return a CSS RGB string value ("rgba(r, g, b)")
         return "rgb(" + this.r + "," + this.g + "," + this.b + ")";
 
     };
 
-    RGBSet.prototype.draw = function (context) {
+    Canvas5.RGBSet.prototype.draw = function (context) {
 
         context = context.x ? Canvas5.currentScene.context : context;
         context.fillStyle = this.getAsString();
@@ -2114,7 +2114,7 @@ function RGBSet(r, g, b) {
     desc: Creates a new Red-Green-Blue-Alpha color value
 */
 
-function RGBASet(r, g, b, a) {
+Canvas5.RGBASet = function (r, g, b, a) {
 
     this.r = r;
     this.g = g;
@@ -2124,14 +2124,14 @@ function RGBASet(r, g, b, a) {
 }
 
     // Get the RGBA values as a CSS string
-    RGBASet.prototype.getAsString = function () {
+    Canvas5.RGBASet.prototype.getAsString = function () {
 
         // Return a CSS RGB string value ("rgba(r, g, b)")
         return "rgba(" + this.r + "," + this.g + "," + this.b + "," + this.a + ")";
 
     };
 
-    RGBASet.prototype.draw = function (context) {
+    Canvas5.RGBASet.prototype.draw = function (context) {
 
         context = context.x ? Canvas5.currentScene.context : context;
         context.fillStyle = this.getAsString();
@@ -2145,7 +2145,7 @@ function RGBASet(r, g, b, a) {
    desc: Creates a new Hue-Saturation-Lightness color value
 */
 
-function HSLSet(h, s, l) {
+Canvas5.HSLSet = function (h, s, l) {
 
     this.h = h;
     this.s = s;
@@ -2155,14 +2155,14 @@ function HSLSet(h, s, l) {
 }
 
     // Get the HSL values as a CSS string
-    HSLSet.prototype.getAsString = function () {
+    Canvas5.HSLSet.prototype.getAsString = function () {
 
         // Return a CSS HSL string value ("hsl(h, s, l)")
         return "hsl(" + this.r + "," + this.g + "," + this.b + "," + (this.a > 1 ? 1 : this.a) + ")";
 
     };
 
-    HSLSet.prototype.draw = function (context) {
+    Canvas5.HSLSet.prototype.draw = function (context) {
 
         context = context.x ? Canvas5.currentScene.context : context;
         context.fillStyle = this.getAsString();
@@ -2176,7 +2176,7 @@ function HSLSet(h, s, l) {
     desc: Creates a new Hue-Saturation-Lightness-Alpha color value
 */
 
-function HSLASet(h, s, l, a) {
+Canvas5.HSLASet = function (h, s, l, a) {
 
     this.h = h;
     this.s = s;
@@ -2187,14 +2187,14 @@ function HSLASet(h, s, l, a) {
 
 
     // Get the HSLA values as a CSS string
-    HSLASet.prototype.getAsString = function () {
+    Canvas5.HSLASet.prototype.getAsString = function () {
 
         // Return a CSS HSLA string value ("hsla(h, s, l, a)")
         return "hsla(" + this.r + "," + this.g + "," + this.b + "," + (this.a > 1 ? 1 : this.a) + ")";
 
     };
 
-    HSLASet.prototype.draw = function (context) {
+    Canvas5.HSLASet.prototype.draw = function (context) {
 
         context = context.x ? Canvas5.currentScene.context : context;
         context.fillStyle = this.getAsString();
@@ -2203,14 +2203,14 @@ function HSLASet(h, s, l, a) {
 
     };
 
-function Pattern(image, repeatType) {
+Canvas5.Pattern = function (image, repeatType) {
 
     this.image = image;
     this.repeatType = repeatType;
 
 }
 
-    Pattern.prototype.draw = function (context) {
+    Canvas5.Pattern.prototype.draw = function (context) {
 
         if (this.repeatType !== "repeat" && this.repeatType !== "repeat-x" && this.repeatType !== "repeat-y" && this.repeatType !== "no-repeat")
 
@@ -2223,14 +2223,14 @@ function Pattern(image, repeatType) {
 
     };
 
-function ColorStop(position, color) {
+Canvas5.ColorStop = function (position, color) {
 
     this.position = position;
     this.color = color;
 
 }
 
-function LinearGradient(line, colorStops, context) {
+Canvas5.LinearGradient = function (line, colorStops, context) {
 
     this.gradient = Canvas5.currentScene !== null ? Canvas5.currentScene.context.createLinearGradient(line.vectors[0].x, line.vectors[0].y, line.vectors[1].x, line.vectors[1].y) : context.createLinearGradient(line.vectors[0].x, line.vectors[0].y, line.vectors[1].x, line.vectors[1].y)
     this.colorStops = colorStops;
@@ -2245,7 +2245,7 @@ function LinearGradient(line, colorStops, context) {
 
 }
 
-    LinearGradient.prototype.draw = function (context) {
+    Canvas5.LinearGradient.prototype.draw = function (context) {
 
         context = context.x ? Canvas5.currentScene.context : context;
         context.fillStyle = this.gradient;
@@ -2254,7 +2254,7 @@ function LinearGradient(line, colorStops, context) {
 
     }
 
-function RadialGradient(position, radius, end, endRadius, colorStops, context) {
+Canvas5.RadialGradient = function (position, radius, end, endRadius, colorStops, context) {
 
     this.gradient = Canvas5.currentScene !== null ? Canvas5.currentScene.context.createRadialGradient(position.x, position.y, radius, end.x, end.y, endRadius) : context.createRadialGradient(line.vectors[0].x, line.vectors[0].y, line.vectors[1].x, line.vectors[1].y)
     this.colorStops = colorStops;
@@ -2269,7 +2269,7 @@ function RadialGradient(position, radius, end, endRadius, colorStops, context) {
 
 }
 
-    LinearGradient.prototype.draw = function (context) {
+    Canvas5.LinearGradient.prototype.draw = function (context) {
 
         context = context.x ? Canvas5.currentScene.context : context;
         context.fillStyle = this.gradient;
@@ -2283,11 +2283,11 @@ function RadialGradient(position, radius, end, endRadius, colorStops, context) {
     desc: Creates a shadow that can be used on different objects
 */
 
-function Shadow (offsetX, offsetY) {
+Canvas5.Shadow = function (offsetX, offsetY) {
 
     this.offsetX = offsetX;
     this.offsetY = offsetY;
-    this.color = new RGBASet(0, 0, 0, 0.75);
+    this.color = new Canvas5.RGBASet(0, 0, 0, 0.75);
     this.blur = 5;
     this.prototype = function () {
 
@@ -2296,7 +2296,7 @@ function Shadow (offsetX, offsetY) {
 }
 
     // Enable the shadow in the context
-    Shadow.prototype.enable = function (context) {
+    Canvas5.Shadow.prototype.enable = function (context) {
 
         // Set context properties for the shadow
         context.shadowOffsetX = this.offsetX;
@@ -2307,7 +2307,7 @@ function Shadow (offsetX, offsetY) {
     };
 
     // Disable the shadow in the context
-    Shadow.prototype.disable = function (context) {
+    Canvas5.Shadow.prototype.disable = function (context) {
 
         // Set all shadow values to 0 and make the shadow transparent
         context.shadowOffsetX = 0;
@@ -2316,19 +2316,3 @@ function Shadow (offsetX, offsetY) {
         context.shadowBlur = 0;
 
     };
-
-
-/*
-* Bind() function
-* (c) paulirish, mrdoob, alteredq
-*/
-
-function bind(scope, fn) {
-
-    return function () {
-
-        fn.apply(scope, arguments);
-
-    };
-
-};
