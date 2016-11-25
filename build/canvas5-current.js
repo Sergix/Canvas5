@@ -532,7 +532,7 @@ Canvas5.Scene = function (domElement) {
         var set, result;
 
         // Render the background
-        set = true || this.background.draw(new Canvas5.Vector(0, 0));
+        set = this.background.draw(new Canvas5.Vector(0, 0));
         if (set)
             this.context.fillRect(0, 0, this.width, this.height);
 
@@ -1102,8 +1102,8 @@ Canvas5.Sprite = function(spriteSheet) {
         this.speed = movementSpeed;
 
         // Add event listeners to the provided DOM object
-        window.addEventListener('keydown', this.onKeyDown, false);
-        window.addEventListener('keyup', this, this.onKeyUp, false);
+        window.addEventListener('keydown', bind(this, this.onKeyDown), false);
+        window.addEventListener('keyup', bind(this, this.onKeyUp), false);
 
     };
 
@@ -1114,8 +1114,8 @@ Canvas5.Sprite = function(spriteSheet) {
         this.jumpHeight = jumpHeight;
 
         // Add event listeners to the provided DOM object
-        window.addEventListener('keydown', this.onKeyDownPlatformer, false);
-        window.addEventListener('keyup', this.onKeyUpPlatformer, false);
+        window.addEventListener('keydown',  bind(this, this.onKeyDownPlatformer), false);
+        window.addEventListener('keyup',  bind(this, this.onKeyUpPlatformer), false);
 
     };
 
@@ -1123,8 +1123,8 @@ Canvas5.Sprite = function(spriteSheet) {
     Canvas5.Sprite.prototype.addMouseListener = function () {
 
         // Add event listeners to the provided DOM object
-        window.addEventListener('mousedown', this.onMouseDown, false);
-        window.addEventListener('mouseup',this.onMouseUp, false);
+        window.addEventListener('mousedown',  bind(this, this.onMouseDown), false);
+        window.addEventListener('mouseup',  bind(this, this.onMouseUp), false);
     };
 
     // Called if event listener is active
@@ -2316,3 +2316,18 @@ Canvas5.Shadow = function (offsetX, offsetY) {
         context.shadowBlur = 0;
 
     };
+	
+/*
+* Bind() function
+* (c) paulirish, mrdoob, alteredq
+*/
+
+function bind(scope, fn) {
+
+    return function () {
+
+        fn.apply(scope, arguments);
+
+    };
+
+};
