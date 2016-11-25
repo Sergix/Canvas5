@@ -532,7 +532,7 @@ Canvas5.Scene = function (domElement) {
         var set, result;
 
         // Render the background
-        set = this.background.draw(new Canvas5.Vector(0, 0));
+        set = true || this.background.draw(new Canvas5.Vector(0, 0));
         if (set)
             this.context.fillRect(0, 0, this.width, this.height);
 
