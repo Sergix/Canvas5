@@ -111,8 +111,10 @@ var Canvas5 = {
 
     keyDown: function (evt) {
         
-        // Push the key code to the activeKeys array
-        Canvas5.activeKeys.push(evt.keyCode);
+        if (Canvas5.activeKeys.indexOf(evt.keyCode) <= -1)
+        
+            // Push the key code to the activeKeys array
+            Canvas5.activeKeys.push(evt.keyCode);
 
     },
 
