@@ -75,6 +75,7 @@ var Canvas5 = {
 
             // Return true
             return 1;
+
         else
 
             // Otherwise, return false
@@ -91,8 +92,10 @@ var Canvas5 = {
 
     mouseDown: function (evt) {
 
-        // Push the current button code to the activeButton array
-        Canvas5.activeButtons.push(evt.button);
+        if (Canvas5.activeButtons.indexOf(evt.button) <= -1)
+
+            // Push the current button code to the activeButton array
+            Canvas5.activeButtons.push(evt.button);
 
     },
 
@@ -112,7 +115,7 @@ var Canvas5 = {
     keyDown: function (evt) {
         
         if (Canvas5.activeKeys.indexOf(evt.keyCode) <= -1)
-        
+
             // Push the key code to the activeKeys array
             Canvas5.activeKeys.push(evt.keyCode);
 
@@ -1309,9 +1312,9 @@ Canvas5.GameMenu = function () {
     Canvas5.GameMenu.prototype.addMouseListener = function () {
 
         // Add a listener to the provided DOM object
-        window.addEventListener('mousemove', this.onMouseMove, false);
-        window.addEventListener('mousedown', this.onMouseDown, false);
-        window.addEventListener('mouseup', this.onMouseUp, false);
+        window.addEventListener('mousemove', bind(this, this.onMouseMove), false);
+        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
 
     };
 
@@ -1474,8 +1477,8 @@ Canvas5.Button = function (text, rect) {
     Canvas5.Button.prototype.addMouseListener = function () {
 
         // Bind listener functions to mouse events using the provided DOM object
-        window.addEventListener('mousedown', this.onMouseDown, false);
-        window.addEventListener('mouseup', this.onMouseUp, false);
+        window.addEventListener('mousedown', bind(this, this.onMouseDown), false);
+        window.addEventListener('mouseup', bind(this, this.onMouseUp), false);
 
     };
 
